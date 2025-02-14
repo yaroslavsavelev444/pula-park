@@ -1,0 +1,37 @@
+/* Основной стиль для кнопки */
+.btn {
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  font-size: .9rem;
+  font-weight: 500;
+  width: auto;
+}
+
+/* Кнопка с фоном */
+.btn-with-bg {
+  background-color: #333;
+}
+
+.btn-with-bg:hover {
+  background-color: #555;
+}
+
+/* Кнопка без фона (просто текст) */
+.btn-no-bg {
+  background-color: transparent;
+  color: black; /* Цвет текста при отсутствии фона */
+}
+
+.btn-no-bg:hover {
+  color: red; 
+}
+
+/* Эффект при нажатии */
+.btn:active {
+  transform: scale(0.95);
+}

@@ -1,0 +1,96 @@
+
+.header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  transition: background 0.3s ease, backdrop-filter 0.3s ease;
+  z-index: 1000;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.project-link i {
+  font-size: 24px; /* Измените размер по необходимости */
+  color: white; /* Цвет иконки */
+}
+
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  padding: 1rem 2rem;
+  background: white;
+  border-radius: 0 0 20px 20px;
+
+}
+
+/* Заголовок */
+.header-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: white;
+}
+
+/* Лого */
+.header-logo {
+  width: 50px;
+}
+
+/* Навигация */
+.header-nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.header-link {
+  color: black;
+  text-decoration: none;
+  font-size: 1.1rem;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.header-link:hover {
+  color: #ff4d4d;
+}
+
+/* Светящийся эффект под курсором */
+.glow {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(rgba(255, 77, 77, 0.3), transparent);
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  transition: transform 0.05s ease-out;
+}
+
+/* Анимации AOS */
+[data-aos="fade-down"] {
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: opacity 0.8s, transform 0.8s;
+}
+
+[data-aos="fade-right"] {
+  opacity: 0;
+  transform: translateX(-20px);
+  transition: opacity 0.8s, transform 0.8s;
+}
+.flex-row { 
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+}
+.nav-link {
+  color: black;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.nav-active {
+  color:darkred;
+  text-decoration: underline;
+  font-weight: bold;
+}
