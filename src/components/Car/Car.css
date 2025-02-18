@@ -27,46 +27,199 @@
 
 /* Правая часть (занимает 80% ширины) */
 .right-content {
-    flex: 0.8;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    border-radius: 20px;
-    background-color: white;
-    padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Колонки будут заполняться, начиная с 300px */
+  gap: 20px; /* Расстояние между карточками */
+  padding: 20px;
+  border-radius: 20px;
+  justify-content: center; /* Центрируем содержимое по горизонтали */
+}
+.right-content-wrapper{
+  background-color: white;
+  width: 100%;
+  border-radius: 20px;
+  flex: 0.8;
 }
 
 .car-card {
-    display: flex;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    overflow: hidden;
-    background: white;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    margin: 10px;
-    width: 100%;
-    max-width: 400px;
-  }
-  
-  .car-card__image img {
-    width: 120px;
-    height: 100px;
-    object-fit: cover;
-  }
-  
-  .car-card__info {
-    padding: 10px;
-    flex: 1;
-  }
-  
-  .car-card__info h3 {
-    margin: 5px 0;
-  }
-  
-  .car-card__info p {
-    margin: 3px 0;
-    font-size: 14px;
-    color: #555;
-  }
-  
+  width: 100%; /* Карточка растягивается по ширине */
+  max-width: 300px; /* Фиксированная максимальная ширина */
+  height: 400px; /* Высота карточки */
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  position: relative;
+}
+
+.car-card__image {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  border-radius: 8px 8px 0 0;
+}
+
+.car-card__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.car-card__info {
+  padding: 10px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.car-card__info h3 {
+  margin: 5px 0;
+}
+
+.car-card__info p {
+  margin: 3px 0;
+  font-size: 14px;
+  color: #555;
+}
+
+
+.image-navigation {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.dot.active {
+  background-color: #fff;
+}
+
+.car-info-bit{
+  width: 70%;
+}
+.menu-icon{
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+/* Стили для контейнера слайдера */
+.slider-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+/* Контейнер миниатюр (иконок) */
+.thumbnail-container {
+  position: absolute;
+  bottom: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2; /* Чтобы миниатюры были поверх изображений */
+  width: 100%;
+}
+
+.thumbnail-container img {
+  width: 60px;
+  height: 60px;
+  margin: 0 5px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border 0.3s ease;
+}
+
+.thumbnail-container img.active {
+  border-color: #ff9900; /* Цвет обводки для активной миниатюры */
+}
+
+/* Обработка зума */
+.zoomable {
+  cursor: zoom-in;
+  transition: transform 0.25s ease;
+}
+
+.zoomable:active {
+  transform: scale(1.5);
+  cursor: zoom-out;
+}
+.image-gallery-image{
+  max-width: 500px;
+}
+.car-modal-gallery{
+  flex: 1;
+}
+
+.car-modal-content h1{
+  text-align: center;
+}
+.modal-wrapper {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  width: 100%; /* Убедитесь, что контейнер занимает всю ширину */
+}
+
+.car-modal-gallery, .modal-info {
+  flex: 1; /* Делим пространство поровну */
+  max-width: 50%; /* Ограничиваем максимальную ширину до 50% для каждого блока */
+  overflow: hidden; /* Прячем возможные переполнения */
+}
+
+.modal-info-items{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex:1;
+}
+.modal-info {
+  padding: 0 20px; /* Добавим отступы для красоты */
+}
+
+.modal-info-item {
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+.menu {
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+}
+.menu-item {
+  cursor: pointer;
+  padding: 5px;
+  height: 28px;
+  border-bottom: 1px solid rgb(187, 187, 187);
+}
+.menu-item:hover {
+  color: #2980b9;
+}

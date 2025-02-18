@@ -11,6 +11,7 @@ import {observer} from "mobx-react-lite";
 import ToastProvider from "./providers/ToastProvider";
 import Cars from "./pages/Cars";
 import Request from "./pages/Request";
+import Loader from "./components/UI/Loader/Loader";
 
 const App = observer(() => {
   const { store, companyStore } = useContext(Context);
@@ -27,23 +28,33 @@ const App = observer(() => {
 
 
   if (store.isLoading) {
-      return <div>Загрузка...</div>
+      return (
+        <div className="App">
+        <Loader />
+      </div>
+      )
   }
 
   return (
     <div className="App">
       <ToastProvider>
-      <Router>
-        <NavBar/>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          {store.isAuth === false && <Route path="/auth" element={<Auth />} />}
-          {store.isAuth === true && <Route path="/profile" element={<Profile />} />}
-          {store.isAuth === true && <Route path="/cars" element={<Cars />} />}
-          {store.isAuth === true && <Route path="/request" element={<Request />} />}
-        </Routes>
-        <FooterBar />
-      </Router>
+        <Router>
+          <NavBar />
+          
+          {store.isLoading ? (
+            <Loader />
+          ) : (
+            <Routes>
+              <Route path="/" element={<Home />} />
+              {store.isAuth === false && <Route path="/auth" element={<Auth />} />}
+              {store.isAuth === true && <Route path="/profile" element={<Profile />} />}
+              {store.isAuth === true && <Route path="/cars" element={<Cars />} />}
+              {store.isAuth === true && <Route path="/request" element={<Request />} />}
+            </Routes>
+          )}
+
+          <FooterBar />
+        </Router>
       </ToastProvider>
     </div>
   );

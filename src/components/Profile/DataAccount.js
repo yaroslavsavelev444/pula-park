@@ -93,7 +93,8 @@ const Profile = () => {
     if (store.user.isActivated === false) {
      showToast({
         text1: "Подтвердите почту, чтобы создать компанию",
-        type: "error",});
+        type: "error"
+      });
       return;
     }
     handleAddCompany();

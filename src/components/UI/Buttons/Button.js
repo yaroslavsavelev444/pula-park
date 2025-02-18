@@ -3,15 +3,13 @@ import PropTypes from "prop-types";
 import "./Button.css"; // Подключаем стили
 
 const Button = ({ children, onClick, className = "", aosProps = {}, haveBaccol = true }) => {
+  // Условное добавление атрибутов AOS, если они есть
+
   return (
     <button
       className={`btn ${haveBaccol ? "btn-with-bg" : "btn-no-bg"} ${className}`} // Условное применение классов
       onClick={onClick}
-      // Условное добавление AOS атрибутов
-      {...(aosProps && {
-        "data-aos": aosProps["data-aos"] || "fade-up",
-        "data-aos-delay": aosProps["data-aos-delay"] || "0",
-      })}
+
     >
       {children}
     </button>

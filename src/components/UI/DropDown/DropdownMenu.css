@@ -1,0 +1,31 @@
+/* DropdownMenu.css */
+.menu {
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border-radius: 12px; /* iOS style rounded corners */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* Soft shadow for iOS style */
+}
+
+.menu-item {
+  cursor: pointer;
+  padding: 10px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid rgb(187, 187, 187);
+  font-size: 16px;
+  color: #333;
+}
+
+.menu-item:hover {
+  background-color: #f0f0f5; /* Light hover effect */
+  color: #2980b9; /* iOS blue tint */
+  border-radius: 8px;
+}
+
+.menu-item:last-child {
+  border-bottom: none; /* Remove the last border */
+}

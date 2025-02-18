@@ -15,12 +15,12 @@ class CompanyService {
         }
     }
 
-    static async addCar(ownerId, carData) {
+    static async addCar(ownerData, carData, folderName) {
         try {
-            console.log('sdfsfd', ownerId, carData);
             const response = await $api.post(`${API_URL}/cars/uploadCar`,{
-                ownerId,
-                carData
+                ownerData,
+                carData,
+                folderName
             });
             return response.data;
         } catch (e) {
@@ -41,6 +41,43 @@ class CompanyService {
             throw e;
         }
     }
+    static async archiveCar(carId) {
+        try {
+            const response = await $api.post(`${API_URL}/cars/archiveCar`, { carId });
+            return response.data;
+        } catch (e) {
+            console.log(e.response?.data?.message);
+            throw e;
+        }
+    }
+    static async deleteCar(carId) {
+        try {
+            const response = await $api.post(`${API_URL}/cars/deleteCar`, { carId });
+            return response.data;
+        } catch (e) {
+            console.log(e.response?.data?.message);
+            throw e;
+        }
+    }
+    static async returnCar(carId) {
+        try {
+            const response = await $api.post(`${API_URL}/cars/returnCar`, { carId });
+            return response.data;
+        } catch (e) {
+            console.log(e.response?.data?.message);
+            throw e;
+        }
+    }
+    static async updateCarData (carId, depositAmount, pricePerDay) {
+        try {
+            const response = await $api.post(`${API_URL}/cars/updateCarData`, { carId, depositAmount, pricePerDay });
+            return response.data;
+        } catch (e) {
+            console.log(e.response?.data?.message);
+            throw e;
+        }
+    }
 }
+
 
 export default CompanyService;

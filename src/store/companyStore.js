@@ -76,10 +76,10 @@ class CompanyStore {
         }
     }
 
-    async addCar (ownerId, carData) {
+    async addCar (carData, folderName, ownerData) {
         this.setLoading(true);
         try {
-            const car = await CompanyService.addCar(ownerId,carData);
+            const car = await CompanyService.addCar(ownerData ,carData, folderName);
             this.setCars(car);
         } catch (e) {
             console.error("Ошибка добавления автомобиля:", e);
@@ -97,6 +97,51 @@ class CompanyStore {
             this.setCars(cars.data);
         } catch (e) {   
             console.error("Ошибка при получении данных автомобилей:", e);
+        } finally {
+            this.setLoading(false);
+        }
+    }
+
+
+    async archiveCar(carId) {
+        this.setLoading(true);
+        try {
+            await CompanyService.archiveCar(carId);
+            this.setCars(this.cars.filter(car => car.id !== carId));
+        } catch (e) {
+            console.error("Ошибка при архивации автомобиля:", e);
+        } finally {
+            this.setLoading(false);
+        }
+    }
+
+    async deleteCar(carId) {
+        this.setLoading(true);
+        try {
+            await CompanyService.deleteCar(carId);
+            this.setCars(this.cars.filter(car => car.id !== carId));
+        } catch (e) {
+            console.error("Ошибка при архивации автомобиля:", e);
+        } finally {
+            this.setLoading(false);
+        }
+    }
+    async returnCar(carId) {
+        this.setLoading(true);
+        try {
+            const restoredCar = await CompanyService.returnCar(carId);
+        } catch (e) {
+            console.error("Ошибка при архивации автомобиля:", e);
+        } finally {
+            this.setLoading(false);
+        }
+    }
+    async updateCarData(carId, depositAmount, pricePerDay) {
+        this.setLoading(true);
+        try {
+            await CompanyService.updateCarData(carId, depositAmount, pricePerDay);
+        } catch (e) {
+            console.error("Ошибка при архивации автомобиля:", e);
         } finally {
             this.setLoading(false);
         }

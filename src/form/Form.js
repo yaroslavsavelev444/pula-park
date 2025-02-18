@@ -3,8 +3,8 @@ import "./Form.css";
 import Input from "../components/UI/Input/Input";
 import Button from "../components/UI/Buttons/Button";
 import { Context } from "../index";
-import { useToast } from "../providers/ToastProvider";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "../providers/ToastProvider";
 // import showNotification from "../utils/showNotification";
 
 
@@ -12,8 +12,8 @@ const Form = () => {
   const [isLogin, setIsLogin] = useState(true);
   const { store } = useContext(Context);
   const { showToast } = useToast();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('yarik.savelev.00.00@mail.ru');
+  const [password, setPassword] = useState('123123qweqwe');
   const navigate = useNavigate(); // Хук для навигации
 
   const [phone, setPhone] = useState('');
@@ -22,9 +22,7 @@ const Form = () => {
   const [role, setRole] = useState('Car_park');
   const [type, setType] = useState('business');
   const [key , setKey] = useState('');
-  console.log('token', localStorage.getItem('token'))
 
-  console.log(store.isAuth);
   const onSubmit = async (event) => {
     event.preventDefault(); // Предотвращение перезагрузки страницы
     try {
@@ -36,9 +34,12 @@ const Form = () => {
       } else {
         await store.registration(email, password, phone, name, surname, role, type, key);
       }
-      
+
+      if (store.isAuth) {
+        navigate("/profile");
+      }
+
       // Показать успех
-      showToast('Успешно!', 'success');
     } catch (error) {
       console.error('Ошибка при отправке данных:', error);
       // Показать ошибку
