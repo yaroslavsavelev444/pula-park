@@ -5,9 +5,10 @@ class CompanyService {
             return $api.get(`${API_URL}/parks/getCompanyData`, { params: { userId } });
     }
 
-    static async fetchCarsData(userId) {
+    static async fetchCarsData(id, selectedStatus, selectedType, selectedSortOptions) {
+        const ownerId = id;
         try {
-            const response = await $api.get(`${API_URL}/cars/allVehicleData`, { params: { userId } });
+            const response = await $api.get(`${API_URL}/cars/allVehicleData`, { params: { ownerId, selectedStatus, selectedType, selectedSortOptions } });
             return response.data;
         } catch (e) {
             console.log(e.response?.data?.message);
@@ -71,6 +72,26 @@ class CompanyService {
     static async updateCarData (carId, depositAmount, pricePerDay) {
         try {
             const response = await $api.post(`${API_URL}/cars/updateCarData`, { carId, depositAmount, pricePerDay });
+            return response.data;
+        } catch (e) {
+            console.log(e.response?.data?.message);
+            throw e;
+        }
+    }
+
+    static async fetchRequests(ownerId, filterParam , sortParam) {
+        const isAdmin = true;
+        try {
+            const response = await $api.get(`${API_URL}/rentalRequests/getRentalRequests`, { params: { isAdmin, ownerId, filterParam , sortParam } });
+            return response.data;
+        } catch (e) {
+            console.log(e.response?.data?.message);
+            throw e;
+        }
+    }
+    static async updateRequestStatus(requestId, newStatus) {
+        try {
+            const response = await $api.patch(`${API_URL}/rentalRequests/updateRequestStatus`, { requestId, newStatus });
             return response.data;
         } catch (e) {
             console.log(e.response?.data?.message);

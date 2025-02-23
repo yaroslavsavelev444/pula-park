@@ -1,28 +1,51 @@
 import { Building, MapPin, Landmark, Mail, Phone } from "lucide-react";
 import Button from "../UI/Buttons/Button";
-
-const CompanyProfile = ({ companyStore, onAddCompany }) => {
+import { observer } from "mobx-react-lite";
+import "./Profile.css";
+const CompanyProfile = ({ companyStore, handleCheckIsEmailVerified }) => {
   return (
     <div className="company-profile">
-      {companyStore.company !==null ? (
-        <div className="company-info">
-          {companyStore.company.avatarUrl ? (
-            <img src={companyStore.company.avatarUrl} alt="Company Avatar" className="cropped-avatar" />
-          ) : (
-            <div className="default-avatar">No Avatar</div>
-          )}
-          <p><Building size={18} /> {companyStore.company?.companyName}</p>
-          <p><MapPin size={18} /> {companyStore.company?.companyAddress}</p>
-          <p><Landmark size={18} /> {companyStore.company?.companyInn}</p>
+      {companyStore.hasCompany === true ? (
+        <div className="company-profile">
+          <div className="company-info">
+            {companyStore.company.avatarUrl ? (
+              <div className="avatar-preview">
+                <img
+                  src={companyStore.company.avatarUrl}
+                  alt="Company Avatar"
+                  className="cropped-avatar"
+                />
+                 <p>
+              <h1>{companyStore.company.companyName}</h1>
+            </p>
+              </div>
+            ) : (
+              <div className="default-avatar">No Avatar</div>
+            )}
+            <p>
+              <MapPin size={18} /> {companyStore.company.companyAddress}
+            </p>
+            <p>
+              <Landmark size={18} /> {companyStore.company.companyInn}
+            </p>
+            <p>
+              <Mail size={18} /> {companyStore.company.contacts.email}
+            </p>
+            <p>
+              <Phone size={18} /> {companyStore.company.contacts.phone}
+            </p>
+          </div>
         </div>
       ) : (
-        <div className="btn-wrapper-company">
-          <h4>Профиль компании</h4>
-          <Button onClick={onAddCompany}>Добавить</Button>
+        <div className="company-profile">
+          <h1>Профиль компании</h1>
+          <div className="btn-wrapper-company">
+            <Button onClick={handleCheckIsEmailVerified}>Добавить</Button>
+          </div>
         </div>
       )}
     </div>
   );
 };
 
-export default CompanyProfile;
+export default observer(CompanyProfile);

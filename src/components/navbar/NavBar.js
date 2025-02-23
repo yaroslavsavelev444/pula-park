@@ -64,7 +64,7 @@ const NavBar = () => {
 
 {store.isAuth === true &&
   <NavLink 
-  to="/requests" 
+  to="/request" 
   className={({ isActive }) => (isActive ? "nav-active" : "nav-link")}
 >
   Заявки

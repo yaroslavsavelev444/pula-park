@@ -8,11 +8,11 @@ import { observer } from "mobx-react-lite";
 
 const CarCard = ({ car, handleFetchCarsData, onClick }) => {
 
-  const {companyStore, store} = useContext(Context);
+  const {companyStore} = useContext(Context);
 
   const {
-    carData: { licensePlate, vin },
-    characteristics: { brand, model, year, fuelType, transmissionType },
+    carData: { licensePlate },
+    characteristics: { brand, model, year, transmissionType },
     rentalOptions: { price_per_day , deposit_amount },
 
     photos,

@@ -20,6 +20,7 @@ const App = observer(() => {
           store.checkAuth()
       }
   }, [])
+  
   useEffect(() => {
     if (store.user?.id) {
         companyStore.fetchCompanyData(store.user.id);

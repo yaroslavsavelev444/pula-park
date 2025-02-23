@@ -6,6 +6,7 @@ class CompanyStore {
     cars = [];
     isLoading = false;
     hasCompany = false;
+    requests = {};
 
     constructor() {
         makeAutoObservable(this);
@@ -37,6 +38,13 @@ class CompanyStore {
         runInAction(() => {
             this.hasCompany = bool;
             console.log("HasCompany set to:", this.hasCompany);
+        })
+    }
+
+    setRequests(requests) {
+        runInAction(() => {
+            this.requests = requests;
+            console.log("Requests set to:", this.requests);
         })
     }
 
@@ -88,12 +96,11 @@ class CompanyStore {
         }
     }
 
-    async fetchCarsData(userId) {
+    async fetchCarsData(id, selectedStatus, selectedType, selectedSortOptions) {
         this.setLoading(true);
         try {
-            if (!userId) return;
-            const cars = await CompanyService.fetchCarsData(userId);
-            console.log("cars", cars.data);  
+            console.log("id", id, "selectedStatus", selectedStatus, "selectedType", selectedType, "selectedSortOptions", selectedSortOptions);   
+            const cars = await CompanyService.fetchCarsData(id, selectedStatus, selectedType, selectedSortOptions);  
             this.setCars(cars.data);
         } catch (e) {   
             console.error("Ошибка при получении данных автомобилей:", e);
@@ -108,6 +115,7 @@ class CompanyStore {
         try {
             await CompanyService.archiveCar(carId);
             this.setCars(this.cars.filter(car => car.id !== carId));
+            this.fetchCarsData(this.company._id, undefined);
         } catch (e) {
             console.error("Ошибка при архивации автомобиля:", e);
         } finally {
@@ -120,6 +128,7 @@ class CompanyStore {
         try {
             await CompanyService.deleteCar(carId);
             this.setCars(this.cars.filter(car => car.id !== carId));
+            this.fetchCarsData(this.company._id, undefined);
         } catch (e) {
             console.error("Ошибка при архивации автомобиля:", e);
         } finally {
@@ -129,7 +138,8 @@ class CompanyStore {
     async returnCar(carId) {
         this.setLoading(true);
         try {
-            const restoredCar = await CompanyService.returnCar(carId);
+             await CompanyService.returnCar(carId);
+             this.fetchCarsData(this.company._id, undefined);
         } catch (e) {
             console.error("Ошибка при архивации автомобиля:", e);
         } finally {
@@ -142,6 +152,33 @@ class CompanyStore {
             await CompanyService.updateCarData(carId, depositAmount, pricePerDay);
         } catch (e) {
             console.error("Ошибка при архивации автомобиля:", e);
+        } finally {
+            this.setLoading(false);
+        }
+    }
+
+    async fetchRequests(ownerId, filterParam , sortParam ) {
+        console.log("ownerId", ownerId, "filterParam", filterParam, "sortParam", sortParam);
+        this.setLoading(true);
+        try {
+            const requests = await CompanyService.fetchRequests(ownerId, filterParam , sortParam);
+            this.setRequests(requests);
+            console.log("fetchRequests", requests);    
+        } catch (e) {
+            console.error("Ошибка при получении заявок:", e);
+        } finally {
+            this.setLoading(false);
+        }
+    }
+
+    async updateRequestStatus(requestId, newStatus) {
+        const isAdmin = true;
+        this.setLoading(true);
+        try {
+            await CompanyService.updateRequestStatus(requestId, newStatus, isAdmin);
+            this.fetchRequests();
+        } catch (e) {
+            console.error("Ошибка при обновлении статуса заявки:", e);
         } finally {
             this.setLoading(false);
         }

@@ -6,7 +6,6 @@ import "../Car/Car.css"; // Подключаем стили
 import Button from "../UI/Buttons/Button";
 import Input from "../UI/Input/Input";
 import { companyStore } from "../..";
-import { Checkbox } from "../UI/CheckBox/CheckBox";
 
 const statusOptions = [
     { value: "available", label: "Доступен" },
@@ -49,15 +48,7 @@ const CarModalContent = ({ car, onClose}) => {
 
   // Определяем текущий статус
   const currentStatus = statusOptions.find(option => option.value === car.carStatus?.status) || statusOptions[0];
-
-      console.log("Статус:", currentStatus);
-
-
-
-  const handleStatusChange = (selectedOption) => {
-    console.log("Статус изменен на:", selectedOption.value);
-    // companyStore.updateCarStatus(car.id, selectedOption.value); // Отправка в хранилище
-  };
+  
   const handleChangeCarData = () => {
      companyStore.updateCarData(car._id, depositAmount, pricePerDay); // Отправка в хранилище
 

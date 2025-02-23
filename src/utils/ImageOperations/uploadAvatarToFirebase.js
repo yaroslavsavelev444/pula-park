@@ -1,5 +1,5 @@
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { storage } from '../firebase/firebase'; // Импортируем уже инициализированное хранилище
+import { storage } from '../../firebase/firebase'; // Импортируем уже инициализированное хранилище
 
 export const uploadAvatarToFirebase = async (file, userId) => {
     if (!file) {

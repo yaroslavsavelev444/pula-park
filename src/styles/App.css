@@ -4,6 +4,7 @@
   flex-direction: column;
   min-height: 100vh; /* Минимальная высота экрана */
   text-align: center;
+  background-color: #e8e8e8;
 }
 
 /* Основной контент занимает всё доступное пространство */
@@ -13,7 +14,6 @@ main {
 
 /* Футер */
 footer {
-  background-color: #282c34;
   color: white;
   text-align: center;
   padding: 10px;
@@ -31,7 +31,6 @@ footer {
 }
 
 .App-header {
-  background-color: #282c34;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -60,4 +59,20 @@ p{
 
 h1{
   font-size: 20px;
+}
+
+.page_wrapper{
+  min-height: 85vh;
+  display: flex;
+  gap: 20px;
+  padding: 2%;
+  margin: 0;
+}
+
+.container{
+  border-radius: 20px;
+  background-color: white;
+  display: flex;
+  width: 100%;
+  padding: 2%;
 }

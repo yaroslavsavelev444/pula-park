@@ -20,6 +20,7 @@
   
   /* Аватар и статус */
   .profile-header {
+    justify-content: flex-start;
     display: flex;
     align-items: center;
     gap: 12px;
@@ -159,7 +160,10 @@
 
 
   .company-info{
-    text-align: center;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
     font-size: 17px;
   }
 
@@ -186,17 +190,36 @@
   }
 
   .avatar-preview{
+    width: 100%;
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
-    flex-direction: column;
-    margin: 5% 0;
+    flex-direction: row;
+    gap: 10px;
 
 }
 .cropped-avatar{
-    width: 100px;
-    height: 100px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     border: 1px solid #ccc; 
 }
 
+
+.user-profile-light-card{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  justify-content: flex-start;
+}
+
+.user-profile-light-name{
+  font-size: 15px;
+}
+
+.user-profile-light-text-data{
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+}
