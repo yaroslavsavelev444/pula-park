@@ -1,5 +1,4 @@
 .footer {
-    background: white;
     color: black;
     text-align: center;
     padding: 1rem 0;
@@ -7,6 +6,15 @@
     align-items: center;
     justify-content: center;
     border-radius: 20px 20px 0 0;
+  }
+
+  [data-theme="dark"] .footer {
+    color: white;
+    background-color: #1e1e1e;
+  }
+  [data-theme="light"] .footer {
+    color: black;
+    background-color: #ffffff;
   }
   
   .back-to-top {

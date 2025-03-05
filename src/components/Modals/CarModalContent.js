@@ -10,11 +10,12 @@ import { companyStore } from "../..";
 const statusOptions = [
     { value: "available", label: "Доступен" },
     { value: "unavailable", label: "Недоступен" },
+    { value: "in_use", label: "В прокате" },
   ];
 
 
   
-const CarModalContent = ({ car, onClose}) => {
+const CarModalContent = ({ car, onClose, showToast}) => {
   const [pricePerDay, setPricePerDay] = useState(car.rentalOptions.price_per_day);
   const [depositAmount, setDepositAmount] = useState(car.rentalOptions.deposit_amount);
   useEffect(() => {
@@ -50,8 +51,14 @@ const CarModalContent = ({ car, onClose}) => {
   const currentStatus = statusOptions.find(option => option.value === car.carStatus?.status) || statusOptions[0];
   
   const handleChangeCarData = () => {
-     companyStore.updateCarData(car._id, depositAmount, pricePerDay); // Отправка в хранилище
-
+    if(pricePerDay <= 1000 || depositAmount < 0 || pricePerDay < 0 || !pricePerDay) {
+      showToast({
+        text1: "Отредактируйте цену",
+        type: "error",
+      })
+      return
+    }
+     companyStore.updateCarData(car._id, depositAmount, pricePerDay, showToast); 
   };
 
   return (
@@ -68,11 +75,11 @@ const CarModalContent = ({ car, onClose}) => {
           <Gallery items={images} showThumbnails={true}  {...galleryOptions}/>
           <>
             <div className="modal-info-item"><span>Статус:</span> {currentStatus.label}</div>
-              <Input value={car.rentalOptions?.price_per_day ? pricePerDay : null}  onChange={(e) => setPricePerDay(e.target.value)}/>
-              <Input value={car.rentalOptions?.deposit_amount ? depositAmount : null}  onChange={(e) => setDepositAmount(e.target.value)} />
-              {car.rentalOptions?.price_per_day !== pricePerDay && car.rentalOptions?.depositAmount !== depositAmount &&  (
-                <Button onClick={handleChangeCarData}>Сохранить</Button>
-              )}
+              <Input value={car.rentalOptions?.price_per_day ? pricePerDay : null}  onChange={(e) => setPricePerDay(e.target.value)} placeholder={'Цена за день'}/>
+              <Input value={car.rentalOptions?.deposit_amount ? depositAmount : null}  onChange={(e) => setDepositAmount(e.target.value)}  placeholder={'Депозит'}/>
+              {(car.rentalOptions?.price_per_day !== pricePerDay || car.rentalOptions?.deposit_amount !== depositAmount) &&  (
+  <Button onClick={handleChangeCarData}>Сохранить</Button>
+)}
           </> 
           
         </div>

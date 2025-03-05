@@ -17,3 +17,16 @@
     margin-top: 10px;
     font-size: 18px;
   }
+
+  .empty-face{
+    font-size: 30px;
+  }
+  [data-theme="dark"] .empty-face,
+  [data-theme="dark"] .empty-text {
+    color: white;
+  }
+
+  [data-theme="light"] .empty-face ,
+  [data-theme="light"] .empty-text {
+    color: black;
+  }

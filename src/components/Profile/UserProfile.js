@@ -1,13 +1,13 @@
 import { Mail, LogOut, RefreshCcw } from "lucide-react";
 import Button from "../UI/Buttons/Button";
 import CompanyProfile from "./CompanyProfile";
-
-const UserProfile = ({ store, companyStore, handleCheckIsEmailVerified, handleResendEmailVerification, handleAlertLogout }) => {
+const UserProfile = ({ store, companyStore, handleCheckIsEmailVerified, handleResendEmailVerification, handleAlertLogout, handleChangePasswordModal, handleOpenSettingsModal }) => {
   return (
     <div className="profile-card">
         <CompanyProfile
           companyStore={companyStore}
           handleCheckIsEmailVerified={handleCheckIsEmailVerified}
+          handleOpenSettingsModal={handleOpenSettingsModal}
         />
           <div className="profile-header">
             <div className="avatar-wrapper">
@@ -42,16 +42,10 @@ const UserProfile = ({ store, companyStore, handleCheckIsEmailVerified, handleRe
               </span>
               {store.user.isActivationLinkExpired === true && (
                 <RefreshCcw
-                  onClick={handleResendEmailVerification}
-                ></RefreshCcw>
+                  onClick={handleResendEmailVerification}></RefreshCcw>
               )}
             </div>
           )}
-
-          <Button className="logout-btn" onClick={handleAlertLogout}>
-            <LogOut size={18} />
-            Выйти
-          </Button>
         </div>
   );
 };

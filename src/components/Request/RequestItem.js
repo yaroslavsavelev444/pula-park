@@ -3,62 +3,50 @@ import PropTypes from "prop-types";
 import "./Request.css";
 import CarItemBit from "../Car/CarItemBit";
 import UserProfileLight from "../Profile/UserProfileLight";
+import { Clock } from "lucide-react";
+import Button from "../UI/Buttons/Button";
 
 const statusMap = {
   pending: "Ожидает",
   rejected: "Отклонено",
   approved: "Одобрено",
   confirmed: "Подтверждено",
-  completed: "Выполнено",
+  cancelledAhead: "Отмена",
 };
 
-const RequestItem = ({ request, onStatusChange }) => {
-  console.log("request", request);  
+
+const RequestItem = ({
+  request,
+  onClick
+}) => {
   const { user, car, phone, status, createdAt } = request;
   const [currentStatus, setCurrentStatus] = useState(status);
-
-  const handleStatusChange = (e) => {
-    const newStatus = e.target.value;
-    setCurrentStatus(newStatus);
-    onStatusChange(request._id, newStatus);
-  };
-
-  // Проверка, чтобы заблокировать селект, если статус одобрен или отклонен
-  const isStatusEditable = status !== "approved" && status !== "rejected";
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
 
   return (
-    <div className="request-item">
+    <div className="request-item" onClick={() => onClick(request)}>
       <div className="request-item__row">
         <CarItemBit car={car} />
       </div>
       <div className="request-item__row">
-        <UserProfileLight user={request.user} />
+        <UserProfileLight user={user} />
       </div>
       <div className="request-item__row">
-        <span className="request-item__label">Дата:</span>
-        <span className="request-item__value">
+        <p className="request-item__label">Дата:</p>
+        <p className="request-item__value">
           {new Date(createdAt).toLocaleString()}
-        </span>
+        </p>
       </div>
       <div className="request-item__row">
-        <span className="request-item__label">Телефон заявки:</span>
+        <p className="request-item__label">Телефон заявки:</p>
         <a href={`tel:${phone}`} className="request-item__link">
           {phone}
         </a>
       </div>
       <div className="request-item__row">
-        <span className="request-item__label">Статус:</span>
-        <select
-          value={currentStatus}
-          onChange={handleStatusChange}
-          className="request-item__status-select"
-        >
-          {Object.keys(statusMap).map((statusKey) => (
-            <option key={statusKey} value={statusKey}>
-              {statusMap[statusKey]}
-            </option>
-          ))}
-        </select>
+        <p className="request-item__label">Статус:</p>
+        <p className="request-item__value">{statusMap[currentStatus]}</p>
       </div>
     </div>
   );
@@ -67,25 +55,14 @@ const RequestItem = ({ request, onStatusChange }) => {
 RequestItem.propTypes = {
   request: PropTypes.shape({
     _id: PropTypes.string.isRequired,
-    car: PropTypes.shape({
-      characteristics: PropTypes.shape({
-        model: PropTypes.string,
-        brand: PropTypes.string,
-        year: PropTypes.number,
-      }).isRequired,
-    }).isRequired,
-    user: PropTypes.shape({
-      _id: PropTypes.string.isRequired,
-      phone: PropTypes.string.isRequired,
-      email: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-    }).isRequired,
+    car: PropTypes.object.isRequired,
+    user: PropTypes.object.isRequired,
     phone: PropTypes.string.isRequired,
     status: PropTypes.string.isRequired,
-    requestDate: PropTypes.string.isRequired,
+    createdAt: PropTypes.string.isRequired,
   }).isRequired,
-  onClick: PropTypes.func.isRequired,
   onStatusChange: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
 };
 
 export default RequestItem;

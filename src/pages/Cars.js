@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import "../components/Car/Car.css";
 import { useContext, useState } from "react";
 import { Context } from "../index";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Button from "../components/UI/Buttons/Button";
 import Modal from "../components/UI/Modal/Modal";
 import Input from "../components/UI/Input/Input";
@@ -16,19 +16,19 @@ import Loader from "../components/UI/Loader/Loader";
 import { uploadImages } from "../utils/ImageOperations/uploadImages";
 import FilterBar from "../components/UI/FilterBar/FilterBar";
 import SelectMenu from "../components/UI/SelectMenu/SelectMenu";
-
+import Empty from "../components/Empty/Empty";
 
 const statusOptions = [
-  { value: "available", label: "Свободные", color: "#F44336", default: true },
+  { value: "available", label: "Свободные", color: "#F44336" },
   { value: "in_use", label: "В прокате", color: "#4CAF50" },
   { value: "unavailable", label: "Недоступные", color: "#2196F3" },
 ];
 
 const typeOptions = [
-  { value: "sedan", label: "Седан", color: "#F44336" , default: true },
+  { value: "sedan", label: "Седан", color: "#F44336" },
   { value: "suv", label: "Кроссовер", color: "#4CAF50" },
-  { value: "truck", label: "Грузовик", color: "#2196F3"},
-  { value: "van", label: "Фургон", color: "#2196F3"},
+  { value: "truck", label: "Грузовик", color: "#2196F3" },
+  { value: "van", label: "Фургон", color: "#2196F3" },
 ];
 
 const sortOptions = [
@@ -57,7 +57,6 @@ const sortOptions = [
   },
 ];
 
-
 const Cars = () => {
   const navigate = useNavigate();
   const { store, companyStore } = useContext(Context);
@@ -81,40 +80,51 @@ const Cars = () => {
   const [wdType, setWdType] = useState("fwd");
   const [trunkVolume, setTrunkVolume] = useState("50");
   const { showToast } = useToast();
-  const [carImages, setCarImages] = useState([]);
-  const defaultStatusOptions = statusOptions.find((option) => option.default);
-  const defaultTypeOptions = typeOptions.find((option) => option.default);
-  const defaultSortOptions = sortOptions.find((option) => option.default);
-  const [selectedStatus, setSelectedStatus] = useState(
-    defaultStatusOptions ? defaultStatusOptions.value : "dateDesc"
-    );
-    
-    const [selectedType, setSelectedType] = useState(
-    defaultTypeOptions ? defaultTypeOptions.value : "sedan"
-    );
-    
-    const [selectedSort, setSelectedSort] = useState(
-    defaultSortOptions ? defaultSortOptions.value : "dateDesc"
-    );
+  const [carImages, setCarImages] = useState([])
+  const { carId } = useParams();
+
+  const storedStatuses = JSON.parse(localStorage.getItem(process.env.CARS_STORAGE_KEY_STATUSES)) || [];
+  const storedTypes = JSON.parse(localStorage.getItem(process.env.CARS_STORAGE_KEY_TYPES)) || [];
+  const storedSort = localStorage.getItem(process.env.CARS_STORAGE_KEY_SORT) || "dateDesc"; // Оставляем как есть
+
+  const [selectedStatuses, setSelectedStatuses] = useState(storedStatuses);
+  const [selectedTypes, setSelectedTypes] = useState(storedTypes);
+  const [selectedSort, setSelectedSort] = useState(storedSort);
+
+  useEffect(() => {
+    if (carId) {
+      const car = companyStore.cars.find(car => car._id === carId);
+      if (car) {
+        console.log("car", car);
+        setCarModalData(car);
+        setModalContent("carModal");
+        setIsModalOpen(true);
+      } else {
+        navigate("/cars"); // Если id не найден, просто показываем список
+      }
+    }
+  }, [carId, companyStore.cars]);
 
   const handleStatusOptionChange = (value) => {
-      setSelectedStatus(value);
-      if (companyStore.company._id !== null) {
-        companyStore.fetchCarsData(
-          companyStore.company._id,
-          value,
-          selectedType,
-          selectedSort
-        );
-      }
-  };
-
-  const handleTypeOptionChange = (value) => {
-    setSelectedType(value);
+    setSelectedStatuses(value);
+    localStorage.setItem(process.env.CARS_STORAGE_KEY_STATUSES, JSON.stringify(value));
     if (companyStore.company._id !== null) {
       companyStore.fetchCarsData(
         companyStore.company._id,
-        selectedStatus,
+        value,
+        selectedTypes,
+        selectedSort
+      );
+    }
+  };
+
+  const handleTypeOptionChange = (value) => {
+    setSelectedTypes(value);
+    localStorage.setItem(process.env.CARS_STORAGE_KEY_TYPES, JSON.stringify(value));
+    if (companyStore.company._id !== null) {
+      companyStore.fetchCarsData(
+        companyStore.company._id,
+        selectedStatuses,
         value,
         selectedSort
       );
@@ -123,19 +133,17 @@ const Cars = () => {
 
   const handleSortOptionChange = (value) => {
     setSelectedSort(value);
+    localStorage.setItem(process.env.CARS_STORAGE_KEY_SORT, value); // Просто сохраняем строку
     if (companyStore.company._id !== null) {
       companyStore.fetchCarsData(
         companyStore.company._id,
-        selectedStatus,
-        selectedType,
+        selectedStatuses,
+        selectedTypes,
         value
       );
     }
   };
 
-  if (store.isAuth === false) {
-    navigate("/auth");
-  }
   const handleAddCar = () => {
     console.log("handleAddCar");
     setModalContent("addCompany");
@@ -156,12 +164,10 @@ const Cars = () => {
   };
 
   const handleCarModal = (car) => {
-    console.log("handleCarModal", car);
     setCarModalData(car);
     setModalContent("carModal");
     setIsModalOpen(true);
   };
-
 
   const handleSendCarData = async () => {
     try {
@@ -206,9 +212,14 @@ const Cars = () => {
   };
   useEffect(() => {
     if (companyStore.company?._id) {
-       companyStore.fetchCarsData(companyStore.company._id, selectedStatus, selectedType, selectedSort);
+      companyStore.fetchCarsData(
+        companyStore.company._id,
+        selectedStatuses,
+        selectedTypes,
+        selectedSort
+      );
     }
- }, [companyStore.company?._id]);
+  }, [companyStore.company?._id]);
 
   const handleUploadComplete = (newImages) => {
     setCarImages(newImages);
@@ -226,18 +237,24 @@ const Cars = () => {
         </div>
         <div className="left-sort">
           <>
-            <FilterBar options={typeOptions} onChange={handleTypeOptionChange} />
-            <FilterBar options={statusOptions} onChange={handleStatusOptionChange} />
+            <FilterBar
+              options={typeOptions}
+              onChange={handleTypeOptionChange}
+            />
+            <FilterBar
+              options={statusOptions}
+              onChange={handleStatusOptionChange}
+            />
           </>
         </div>
       </div>
       <div className="right-content-wrapper">
-      <div className="right-sort-wrapper">
-      <SelectMenu
-   options={sortOptions}
-   onChange={handleSortOptionChange}
-   value={selectedSort}
-/>
+        <div className="right-sort-wrapper">
+          <SelectMenu
+            options={sortOptions}
+            onChange={handleSortOptionChange}
+            value={selectedSort}
+          />
         </div>
         <div className="right-content">
           {companyStore.cars.length > 0 ? (
@@ -252,11 +269,11 @@ const Cars = () => {
               ))}
             </>
           ) : (
-            <h1>У вас нет автомобилей</h1>
+            <Empty text="Нет автомобилей" />
           )}
         </div>
       </div>
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} fullscreen>
         {modalContent === "addCompany" && (
           <>
             <h1>Добавить автомобиль</h1>
@@ -389,6 +406,8 @@ const Cars = () => {
             <CarModalContent
               car={carModalData}
               onClose={() => setIsModalOpen(false)}
+              showToast={showToast}
+
             />
           </>
         )}

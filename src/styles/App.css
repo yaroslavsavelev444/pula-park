@@ -1,11 +1,26 @@
+[data-theme="dark"] {
+  --bg-color: #121212;
+  --text-color: white;
+  --container-bg: #1e1e1e;
+}
+
+[data-theme="light"]  {
+  --bg-color: #e8e8e8;
+  --text-color: black;
+  --container-bg: white;
+  
+}
+
 /* Главный контейнер */
 .App {
   display: flex;
   flex-direction: column;
-  min-height: 100vh; /* Минимальная высота экрана */
+  min-height: 100vh;
   text-align: center;
-  background-color: #e8e8e8;
+  background-color: var(--bg-color);
+  color: var(--text-color);
 }
+
 
 /* Основной контент занимает всё доступное пространство */
 main {
@@ -17,6 +32,31 @@ footer {
   color: white;
   text-align: center;
   padding: 10px;
+}
+
+[data-theme="dark"] .right-content-wrapper, 
+[data-theme="dark"] .left-add-car, 
+[data-theme="dark"] .left-sort {
+  background-color: #1e1e1e;
+  color: white;
+}
+
+[data-theme="light"] .right-content-wrapper, 
+[data-theme="light"] .left-add-car, 
+[data-theme="light"] .left-sort ,
+[data-theme="light"] footer, 
+[data-theme="light"] .header-container 
+{
+  background-color: white;
+  color: black;
+}
+
+[data-theme="dark"] .car-card {
+  background-color: #1e1e1e;
+}
+
+[data-theme="light"] .car-card {
+  background-color: #e8e8e8;
 }
 
 .App-logo {

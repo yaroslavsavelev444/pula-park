@@ -69,11 +69,19 @@ class CompanyService {
             throw e;
         }
     }
-    static async updateCarData (carId, depositAmount, pricePerDay) {
+    static async updateCarData (carId, depositAmount, pricePerDay, showToast) {
         try {
             const response = await $api.post(`${API_URL}/cars/updateCarData`, { carId, depositAmount, pricePerDay });
+            showToast({
+                text1: "Данные успешно изменены",
+                type: "success",
+            })
             return response.data;
         } catch (e) {
+            showToast({
+                text1: "Произошла ошибка",
+                type: "error",
+            })
             console.log(e.response?.data?.message);
             throw e;
         }
@@ -89,9 +97,28 @@ class CompanyService {
             throw e;
         }
     }
-    static async updateRequestStatus(requestId, newStatus) {
+    static async updateRequestStatus(requestId, newStatus, startDate, endDate ) {
         try {
-            const response = await $api.patch(`${API_URL}/rentalRequests/updateRequestStatus`, { requestId, newStatus });
+            const response = await $api.patch(`${API_URL}/rentalRequests/updateRequestStatus`, { requestId, newStatus, startDate, endDate });
+            return response.data;   
+        } catch (e) {
+            console.log(e.response?.data?.message);
+            throw e;
+        }
+    }
+    static async cancelCancelRequestAhead(requestId, message, userId) {
+        try {
+            const response = await $api.patch(`${API_URL}/rentalRequests/cancelCancelRequestAhead`, { requestId, message, userId });
+            return response.data;
+        } catch (e) {
+            console.log(e.response?.data?.message);
+            throw e;
+        }
+    }
+
+    static async fetchRentals(ownerId, filterParam , sortParam) {
+        try {
+            const response = await $api.get(`${API_URL}/rentalRequests/getRentals`, { params: { ownerId, filterParam , sortParam } });
             return response.data;
         } catch (e) {
             console.log(e.response?.data?.message);

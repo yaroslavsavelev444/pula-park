@@ -1,4 +1,4 @@
-import { makeAutoObservable, runInAction } from "mobx";
+import { makeAutoObservable, runInAction, set } from "mobx";
 import AuthService from "../services/AuthService";
 import axios from "axios";
 import { API_URL } from "../http/axios";
@@ -7,6 +7,7 @@ export default class Store {
   user = {};
   isAuth = false;
   isLoading = false;
+  settings = {};
 
   constructor() {
     makeAutoObservable(this);
@@ -30,6 +31,19 @@ export default class Store {
     runInAction(() => {
       this.isLoading = bool;
       console.log("Loading set to:", this.isLoading);
+    });
+  }
+
+
+  setSettings(settings) {
+    runInAction(() => {
+      // Устанавливаем настройки с фиксированными полями
+      this.settings = {
+        notificationRequest: settings.notificationRequest || false,
+        notificationTO: settings.notificationTO || false,
+        notificationNewRequests: settings.notificationNewRequests || false,
+      };
+      console.log("Settings set to:", this.settings);
     });
   }
 
@@ -107,4 +121,99 @@ export default class Store {
         throw e;
     }
  }
+
+ async changePassword(oldPassword, newPassword, userId, showToast) {
+  try {
+    console.log('changePassword', oldPassword, "newPassword",  newPassword, "userId", userId);
+    const res = await AuthService.changePassword(oldPassword, newPassword, userId);
+
+    if (res.status === 200) {
+      this.logout();
+      showToast({
+        text1: "Пароль успешно изменен",
+        type: "success",
+      });
+      console.log('Password changed successfully');
+    }
+  } catch (e) {
+    // Обработка ошибок от сервера
+    const errorMessage = e.response?.data?.message || "Неизвестная ошибка";
+    showToast({
+      text1: errorMessage,
+      type: "error",
+    });
+    console.log("Error:", errorMessage);
+    throw e;
+  }
 }
+async forgotPassword(email, showToast) {
+  try {
+    console.log('forgotPassword', email);
+    const res = await AuthService.forgotPassword(email);
+    console.log(res);
+    if (res.status === 200) {
+      showToast({
+        text1: "Письмо отправлено",
+        type: "success",
+      });
+      console.log('Email sent successfully');
+    }
+  } catch (e) {
+    showToast({
+      text1: e.response?.data?.message || "Неизвестная ошибка",
+      type: "error",
+    })
+    const errorMessage = e.response?.data?.message || "Неизвестная ошибка";
+    console.log("Error:", errorMessage);
+    throw e;
+  } 
+  
+}
+
+async resetForgottenPassword(token, newPassword) {
+  try {
+    const res = await AuthService.resetForgottenPasswod(token, newPassword);
+    console.log(res);
+    if (res.status === 200) {
+      console.log('Password changed successfully');
+    }
+  } catch (e) {
+    const errorMessage = e.response?.data?.message || "Неизвестная ошибка";
+    console.log("Error:", errorMessage);
+    throw e;
+  }
+
+}
+
+async updateSetting(key, value) {
+  try {
+    const res = await AuthService.updateSetting(key, value);
+    console.log(res);
+    if (res.status === 200) {
+      console.log('Setting changed successfully');
+    }
+  } catch (e) {
+    const errorMessage = e.response?.data?.message || "Неизвестная ошибка";
+    console.log("Error:", errorMessage);
+    throw e;
+  }
+}
+
+async fetchSettings() {
+  try {
+    const response = await AuthService.fetchSettings();
+    console.log('response', response);
+    this.setSettings(response.data);
+    if (response.status === 200) {
+      console.log('Settings fetched successfully');
+    }
+  } catch (e) {
+    const errorMessage = e.response?.data?.message || "Неизвестная ошибка";
+    console.log("Error:", errorMessage);
+    throw e;
+  }
+
+}
+}
+
+

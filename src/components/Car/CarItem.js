@@ -7,7 +7,6 @@ import { Context } from "../../index";
 import { observer } from "mobx-react-lite";
 
 const CarCard = ({ car, handleFetchCarsData, onClick }) => {
-
   const {companyStore} = useContext(Context);
 
   const {
@@ -24,7 +23,9 @@ const CarCard = ({ car, handleFetchCarsData, onClick }) => {
   ? ["Архив", "Удалить"]
   : car.carStatus.status === "unavailable"
   ? ["Вернуть", "Удалить"]
-  : [""];
+   : car.carStatus.status === "in_use"
+  ? []
+  : [];
 
 
   const handleOptionClick = async (option) => {
@@ -74,22 +75,22 @@ const CarCard = ({ car, handleFetchCarsData, onClick }) => {
         </h3>
         <div className="car-info-bit">
           <p className="modal-info-item">
-            <strong>Номер:</strong> {licensePlate}
+            <p>Номер:</p> <p>{licensePlate}</p>
           </p>
           <p className="modal-info-item">
-            <strong>КПП:</strong> {transmissionType}
+            <p>КПП:</p> <p>{transmissionType}</p>
           </p>
           <p className="modal-info-item">
-            <strong>Депозит:</strong>
-            {deposit_amount ? `${deposit_amount} ₽` : "Нет"}
+            <p>Депозит:</p>
+            <p>{deposit_amount ? `${deposit_amount} ₽` : "Нет"}</p>
           </p>
           <p className="modal-info-item">
-            <strong>Цена в день:</strong>{" "}
-            {price_per_day ? `${price_per_day} ₽` : "Не указана"}
+            <p>Цена в день:</p>{" "}
+            <p>{price_per_day ? `${price_per_day} ₽` : "Не указана"}</p>
           </p>
           <p className="modal-info-item">
-            <strong>Статус:</strong>
-            {car.carStatus.status === "available" ? "Доступен" : "Недоступен"}
+            <p>Статус:</p>
+            <p>{car.carStatus.status === "available" ? "Доступен" : "in_use" ? "В аренде" : "Недоступен"}</p>
           </p>
         </div>
       </div>

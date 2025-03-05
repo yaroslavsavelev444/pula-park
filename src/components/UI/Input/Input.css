@@ -1,6 +1,9 @@
 .input-wrapper {
     margin-bottom: 15px;
     width: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
   }
   
   input {
@@ -10,6 +13,14 @@
     border-radius: 4px;
   }
   
+  .eye-icon {
+    position: absolute;
+    right: -40px;
+    cursor: pointer;
+    font-size: 20px;
+    color: #888;
+  }
+
   input:focus {
     border-color: #0052cc;
     outline: none;

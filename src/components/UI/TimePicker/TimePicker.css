@@ -1,0 +1,24 @@
+.custom-time-picker {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .react-time-picker {
+    border: none;
+    background-color: #f8f8f8;
+    border-radius: 8px;
+    padding: 8px;
+    font-size: 16px;
+    color: #333;
+  }
+  
+  .react-time-picker__inputGroup {
+    display: flex;
+    gap: 5px;
+  }
+  
+  .react-time-picker__wrapper {
+    border: none !important;
+    background-color: transparent !important;
+  }

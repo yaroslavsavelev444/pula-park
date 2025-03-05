@@ -6,7 +6,7 @@ import "./Modal.css";
 const Modal = ({ isOpen, onClose, children }) => {
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = "hidden"; // Блокируем скролл страницы при открытом модальном окне
+      document.body.style.overflow = "hidden"; 
     } else {
       document.body.style.overflow = "auto";
     }

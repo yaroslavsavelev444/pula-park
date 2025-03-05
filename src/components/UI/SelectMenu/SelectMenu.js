@@ -1,5 +1,6 @@
 import React from 'react';
 import Select from 'react-select';
+import "./SelectMenu" ;
 
 // Кастомный компонент Select
 const SelectMenu = ({ options, value, onChange, label }) => {

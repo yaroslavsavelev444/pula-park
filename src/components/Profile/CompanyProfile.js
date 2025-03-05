@@ -2,7 +2,9 @@ import { Building, MapPin, Landmark, Mail, Phone } from "lucide-react";
 import Button from "../UI/Buttons/Button";
 import { observer } from "mobx-react-lite";
 import "./Profile.css";
-const CompanyProfile = ({ companyStore, handleCheckIsEmailVerified }) => {
+import { IoMdSettings } from "react-icons/io";
+
+const CompanyProfile = ({ companyStore, handleCheckIsEmailVerified, handleOpenSettingsModal }) => {
   return (
     <div className="company-profile">
       {companyStore.hasCompany === true ? (
@@ -15,9 +17,10 @@ const CompanyProfile = ({ companyStore, handleCheckIsEmailVerified }) => {
                   alt="Company Avatar"
                   className="cropped-avatar"
                 />
-                 <p>
-              <h1>{companyStore.company.companyName}</h1>
-            </p>
+                <p>
+                  <h1>{companyStore.company.companyName}</h1>
+                </p>
+                <IoMdSettings className="settings-icon"  onClick={handleOpenSettingsModal}/>
               </div>
             ) : (
               <div className="default-avatar">No Avatar</div>

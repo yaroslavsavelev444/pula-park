@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import "./NavBar.css";
@@ -6,9 +6,8 @@ import logo from "../../img/3d_logo_solo.png";
 import { NavLink } from "react-router-dom";
 import { observer } from "mobx-react-lite";
 import { Context } from "../../index";
-
 const NavBar = () => {
-  const { store } = useContext(Context);
+  const { store, companyStore } = useContext(Context);
   useEffect(() => {
     AOS.init({ duration: 1000 });
   }, []);
@@ -20,6 +19,8 @@ const NavBar = () => {
   const inactiveLink = {
     color: "black",
   };
+
+
 
   return (
     <header>
@@ -54,7 +55,7 @@ const NavBar = () => {
 
 {store.isAuth === true &&
   <NavLink 
-  to="/cars" 
+  to="/cars/" 
   className={({ isActive }) => (isActive ? "nav-active" : "nav-link")}
 >
   Мои авто
@@ -67,10 +68,20 @@ const NavBar = () => {
   to="/request" 
   className={({ isActive }) => (isActive ? "nav-active" : "nav-link")}
 >
-  Заявки
+Заявки
 </NavLink>
 
 }
+{store.isAuth === true &&
+  <NavLink 
+  to="/rentals" 
+  className={({ isActive }) => (isActive ? "nav-active" : "nav-link")}
+>
+  Аренды
+</NavLink>
+
+}
+
 
 
 

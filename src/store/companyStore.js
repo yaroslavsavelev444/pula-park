@@ -1,12 +1,36 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import CompanyService from "../services/CompanyService";
 import $api , { API_URL } from "../http/axios";
+
+
 class CompanyStore {
     company = {};
     cars = [];
     isLoading = false;
     hasCompany = false;
-    requests = {};
+    requests = [];
+    rentals=[];
+
+
+    get carsList() {
+        return Array.isArray(this.cars) ? this.cars : [];
+    }
+
+    get requestsList() {
+        return Object.values(this.requests || {});
+    }
+
+    get carsCount() {
+        return this.carsList.length;
+    }
+
+    get rentalsList() {
+        return Object.values(this.rentals || {});
+    }
+
+    get hasActiveCompany() {
+        return !!this.company && Object.keys(this.company).length > 0;
+    }
 
     constructor() {
         makeAutoObservable(this);
@@ -45,6 +69,12 @@ class CompanyStore {
         runInAction(() => {
             this.requests = requests;
             console.log("Requests set to:", this.requests);
+        })
+    }
+    setRentals(rentals) {
+        runInAction(() => {
+            this.rentals = rentals;
+            console.log("Rentals set to:", this.rentals);
         })
     }
 
@@ -146,10 +176,10 @@ class CompanyStore {
             this.setLoading(false);
         }
     }
-    async updateCarData(carId, depositAmount, pricePerDay) {
+    async updateCarData(carId, depositAmount, pricePerDay, showToast) {
         this.setLoading(true);
         try {
-            await CompanyService.updateCarData(carId, depositAmount, pricePerDay);
+            await CompanyService.updateCarData(carId, depositAmount, pricePerDay, showToast);
         } catch (e) {
             console.error("Ошибка при архивации автомобиля:", e);
         } finally {
@@ -158,7 +188,7 @@ class CompanyStore {
     }
 
     async fetchRequests(ownerId, filterParam , sortParam ) {
-        console.log("ownerId", ownerId, "filterParam", filterParam, "sortParam", sortParam);
+        console.log('fetchRequests', "ownerId", ownerId, "filterParam", filterParam, "sortParam", sortParam);
         this.setLoading(true);
         try {
             const requests = await CompanyService.fetchRequests(ownerId, filterParam , sortParam);
@@ -170,12 +200,39 @@ class CompanyStore {
             this.setLoading(false);
         }
     }
-
-    async updateRequestStatus(requestId, newStatus) {
-        const isAdmin = true;
+    async fetchRentals(ownerId, filterParam , sortParam ) {
+        console.log('Rentals', "ownerId", ownerId, "filterParam", filterParam, "sortParam", sortParam);
         this.setLoading(true);
         try {
-            await CompanyService.updateRequestStatus(requestId, newStatus, isAdmin);
+            const rentals = await CompanyService.fetchRentals(ownerId, filterParam , sortParam);
+            this.setRentals(rentals);
+            console.log("fetchRentals", rentals);    
+        } catch (e) {
+            console.error("Ошибка при получении рентал:", e);
+        } finally {
+            this.setLoading(false);
+        }
+    }
+
+    async updateRequestStatus(requestId, newStatus, startDate, endDate) {
+        this.setLoading(true);
+        try {
+            await CompanyService.updateRequestStatus(requestId, newStatus, startDate, endDate);
+            this.fetchRequests();
+        } catch (e) {
+            console.error("Ошибка при обновлении статуса заявки:", e);
+        } finally {
+            this.setLoading(false);
+        }
+    }
+
+    async cancelCancelRequestAhead(requestId, message, userId) {
+        this.setLoading(true);
+        if(!requestId || !message){
+            return;
+        }
+        try {
+            await CompanyService.cancelCancelRequestAhead(requestId, message, userId);
             this.fetchRequests();
         } catch (e) {
             console.error("Ошибка при обновлении статуса заявки:", e);

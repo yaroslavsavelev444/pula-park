@@ -1,0 +1,81 @@
+.custom-date-time-picker {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+    font-family: Arial, sans-serif;
+  }
+  
+  /* Светлая тема (по умолчанию) */
+  .custom-date-time-picker label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .custom-date-time-picker input {
+    width: 150px;
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-align: center;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+    background-color: #fff;
+    color: #000;
+  }
+  
+  .custom-date-time-picker input:focus {
+    border-color: #007bff;
+  }
+  
+  /* Контейнеры для выбора даты и времени */
+  .custom-date-time-picker .date-picker,
+  .custom-date-time-picker .time-picker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  /* Обёртка для react-time-picker */
+  .custom-date-time-picker .react-time-picker {
+    display: flex;
+    align-items: center;
+  }
+  
+  .custom-date-time-picker .react-time-picker__wrapper {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 4px;
+  }
+  
+  .custom-date-time-picker .react-time-picker__inputGroup {
+    font-size: 16px;
+  }
+  
+  /* ТЁМНАЯ ТЕМА */
+  [data-theme="dark"] .custom-date-time-picker label {
+    color: #ddd;
+  }
+  
+  [data-theme="dark"] .custom-date-time-picker input {
+    background-color: #222;
+    color: #fff;
+    border: 1px solid #555;
+  }
+  
+  [data-theme="dark"] .custom-date-time-picker input:focus {
+    border-color: #0d6efd;
+  }
+  
+  /* Тёмная тема для react-time-picker */
+  [data-theme="dark"] .custom-date-time-picker .react-time-picker__wrapper {
+    background-color: #222;
+    border: 1px solid #555;
+  }
+  
+  [data-theme="dark"] .custom-date-time-picker .react-time-picker__inputGroup {
+    color: #fff;
+  }

@@ -13,15 +13,23 @@
   color: white; /* Цвет иконки */
 }
 
+
 .header-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
   position: relative;
   padding: 1rem 2rem;
-  background: white;
   border-radius: 0 0 20px 20px;
 
+}
+[data-theme="dark"] .header-container {
+  color: white;
+  background-color: #1e1e1e;
+}
+[data-theme="light"] .header-container {
+  color: black;
+  background-color: #ffffff;
 }
 
 /* Заголовок */
@@ -87,6 +95,10 @@
   color: black;
   text-decoration: none;
   transition: color 0.3s ease;
+}
+
+[data-theme="dark"] .nav-link {
+  color: white;
 }
 
 .nav-active {

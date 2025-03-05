@@ -5,6 +5,7 @@ import Button from "../Buttons/Button";
 import { MdClear } from "react-icons/md";
 
 const FilterBar = ({ options, onChange }) => {
+  
   const defaultOption = options.find((option) => option.default)?.value || null;
   const [selectedFilters, setSelectedFilters] = useState(
     defaultOption ? [defaultOption] : []

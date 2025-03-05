@@ -2,15 +2,24 @@ import React from "react";
 import PropTypes from "prop-types";
 import "./Car.css";
 import { observer } from "mobx-react-lite";
+import { useNavigate } from "react-router-dom";
+
 
 const CarCardSimple = ({ car }) => {
+  const navigate = useNavigate(); // Хук для навигации
   const {
     carData: { licensePlate },
     characteristics: { brand, model, year },
     photos,
   } = car;
+  const carId = car?._id;
+
+  const handleNavigateToCarModal = (car) => {
+    navigate(`/cars/${carId}`);
+  };
+
   return (
-    <div className="car-card-bit">
+    <div className="car-card-bit" onClick={() => handleNavigateToCarModal(car)}>
       <div className="car-card-image-bit">
         <img
           src={photos?.[0] || "/default-car.jpg"} // Используем первое фото

@@ -1,0 +1,36 @@
+.toggle-root {
+    width: 40px;
+    height: 24px;
+    background-color: #d1d5db;
+    border-radius: 9999px;
+    position: relative;
+    transition: background-color 0.2s;
+  }
+  
+  .toggle-root[data-state="checked"] {
+    background-color: #3b82f6;
+  }
+  
+  .toggle-thumb {
+    width: 16px;
+    height: 16px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 4px;
+    transform: translateY(-50%);
+    transition: transform 0.2s;
+  }
+  
+  .toggle-root[data-state="checked"] .toggle-thumb {
+    transform: translate(16px, -50%);
+  }
+
+  .toggle-wrapper{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
