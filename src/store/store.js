@@ -2,7 +2,6 @@ import { makeAutoObservable, runInAction, set } from "mobx";
 import AuthService from "../services/AuthService";
 import axios from "axios";
 import { API_URL } from "../http/axios";
-
 export default class Store {
   user = {};
   isAuth = false;
@@ -92,6 +91,7 @@ export default class Store {
       console.log(e.response?.data?.message);
     }
   }
+
 
   async checkAuth() {
     this.setLoading(true);

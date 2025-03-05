@@ -81,6 +81,15 @@ const NavBar = () => {
 </NavLink>
 
 }
+{store.isAuth === true &&
+  <NavLink 
+  to="/chats" 
+  className={({ isActive }) => (isActive ? "nav-active" : "nav-link")}
+>
+  Чаты
+</NavLink>
+
+}
 
 
 
