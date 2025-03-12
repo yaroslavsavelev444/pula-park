@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import "react-image-gallery/styles/css/image-gallery.css";
 import PropTypes from "prop-types";
 import CarItemBit from "../Car/CarItemBit";
@@ -7,7 +7,9 @@ import { Clock } from "lucide-react";
 import SelectMenu from "../UI/SelectMenu/SelectMenu";
 import Button from "../UI/Buttons/Button";
 import Input from "../UI/Input/Input";
-import { companyStore } from "../..";
+import { getRentalCancelReason } from "../constants/maps";
+import { Context } from "../..";
+import "../Rental/RentalItem.css"; 
 
 const options = [
     { value: "notCome", label: "Не пришел в офис " },
@@ -37,9 +39,11 @@ const formatDate = (isoString) => {
 const RentalModalContent = ({
   rental,
   onClose,
+  showToast
 }) => {
+  const {store , companyStore } = useContext(Context);
     console.log('sdfsdfs', rental);
-    const [reason, setReason] = useState(false);
+    const [cancelReason, setCancelReason] = useState(false);
     const [cancelRentalVisible, setRentalCancelVisible] = useState(false);
   useEffect(() => {
     const handleEsc = (event) => {
@@ -55,15 +59,14 @@ const RentalModalContent = ({
 
   
   const handleCancelRental = () => {
-    if (reason) {
-      companyStore.cancelRental(rental._id, reason);
+    if (cancelReason) {
+      companyStore.cancelRental(rental._id, cancelReason, showToast);
       setRentalCancelVisible(false);
     }
   };
 
   return (
     <div className="car-modal-content">
-      Аренда N{rental?._id}
       <div className="request-item__row">
         <CarItemBit car={rental.rental.car} />
       </div>
@@ -80,11 +83,20 @@ const RentalModalContent = ({
           </div>
         </p>
       </div>
-      <div style={{gap:"10px", display:"flex", flexDirection:"column"}}>
-      <Button onClick={() => setRentalCancelVisible(prev => !prev)} haveBaccol={false}>
-  <p style={{ color: "red" }}>Отозвать аренду</p>
-</Button>   
-</div>
+      {rental.status !== 'canceled' && rental.status !== 'completed' &&  (
+        <div style={{gap:"10px", display:"flex", flexDirection:"column"}}>
+        <Button onClick={() => setRentalCancelVisible(prev => !prev)} haveBaccol={false}>
+          <p style={{ color: "red" }}>Отозвать аренду</p>
+        </Button>   
+        </div>
+      )}
+      {rental.status === 'canceled' && (
+        <div className="rental-cancel-data">
+            <p>Аренда отозвана</p>
+            <p>Причина: {getRentalCancelReason(rental?.cancelData?.reason) || "Неизвестно"}</p>
+            <p>Инициатор: { rental?.cancelData?.iniciator === store.user.id ? "Вы" : "Клиент"} </p>
+          </div>
+      )}
    {cancelRentalVisible && (
         <div style={{gap:"10px", display:"flex", flexDirection:"column"}}>
         <SelectMenu
@@ -98,11 +110,11 @@ const RentalModalContent = ({
             console.log("closed");
           }}
           onChange={(value) => {
-            setReason(value);
+            setCancelReason(value);
             console.log(value);
           }}
         />
-        {reason === 'other' && <div ><Input placeholder = "Причина"/></div>}
+        {cancelReason === 'other' && <div ><Input placeholder = "Причина"/></div>}
         <Button onClick={() => handleCancelRental()}>Подтвердить</Button>
         </div>
       )}

@@ -5,3 +5,9 @@
     justify-content: flex-start;
     gap: 5px;
 }
+.rental-cancel-data{
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    gap: 10px;
+}

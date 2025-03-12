@@ -8,7 +8,7 @@ import Button from "../UI/Buttons/Button";
 
 const statusMap = {
   pending: "Ожидает",
-  cancelledAhead: "Отмена",
+  cancelled: "Отмена",
 };
 
 const RequestItemMini = ({

@@ -35,3 +35,34 @@
 .btn:active {
   transform: scale(0.95);
 }
+
+/* Кнопка с лайка */
+.like-button {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  gap: 6px;
+  user-select: none;
+  transition: transform 0.1s ease-in-out;
+}
+
+.like-button:active {
+  transform: scale(0.9);
+}
+
+.heart-icon {
+  width: 24px;
+  height: 24px;
+  stroke: #555;
+  transition: stroke 0.2s ease-in-out, fill 0.2s ease-in-out;
+}
+
+.heart-icon.liked {
+  fill: red;
+  stroke: red;
+}
+
+.like-count {
+  font-size: 16px;
+  color: #333;
+}

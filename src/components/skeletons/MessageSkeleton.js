@@ -12,12 +12,7 @@ const MessageSkeleton = () => {
               <div className="avatar-size">
                 <div className="skeleton skeleton-avatar" />
               </div>
-            </div>
-  
-            <div className="chat-header mb-1">
-              <div className="skeleton skeleton-header" />
-            </div>
-  
+            </div>  
             <div className="chat-bubble bg-transparent p-0">
               <div className="skeleton skeleton-bubble" />
             </div>

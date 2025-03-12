@@ -5,7 +5,6 @@ import { storage } from "../../firebase/firebase";
 const uploadImages = async (carImages, companyStore) => {
 
     if (carImages.length < 3) {
-      alert("Минимум 3 фото для загрузки");
       return;
     }
     const folderName = generateRandomFolderName();

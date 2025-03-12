@@ -87,10 +87,10 @@ class CompanyService {
         }
     }
 
-    static async fetchRequests(ownerId, filterParam , sortParam) {
-        const isAdmin = true;
+    //ЗАЯВКИ  
+    static async getRequests( ownerId , filterParam , sortParam) {
         try {
-            const response = await $api.get(`${API_URL}/rentalRequests/getRentalRequests`, { params: { isAdmin, ownerId, filterParam , sortParam } });
+            const response = await $api.get(`${API_URL}/request/getRequests`, { params: { ownerId, filterParam , sortParam } });
             return response.data;
         } catch (e) {
             console.log(e.response?.data?.message);
@@ -99,16 +99,16 @@ class CompanyService {
     }
     static async updateRequestStatus(requestId, newStatus, startDate, endDate ) {
         try {
-            const response = await $api.patch(`${API_URL}/rentalRequests/updateRequestStatus`, { requestId, newStatus, startDate, endDate });
+            const response = await $api.patch(`${API_URL}/request/updateRequestStatus`, { requestId, newStatus, startDate, endDate });
             return response.data;   
         } catch (e) {
             console.log(e.response?.data?.message);
             throw e;
         }
     }
-    static async cancelCancelRequestAhead(requestId, message, userId) {
+    static async cancelRequest(requestId, message) {
         try {
-            const response = await $api.patch(`${API_URL}/rentalRequests/cancelCancelRequestAhead`, { requestId, message, userId });
+            const response = await $api.patch(`${API_URL}/request/cancelRequest`, { requestId, message });
             return response.data;
         } catch (e) {
             console.log(e.response?.data?.message);
@@ -116,13 +116,55 @@ class CompanyService {
         }
     }
 
+    //Аренда
+
     static async fetchRentals(ownerId, filterParam , sortParam) {
         try {
-            const response = await $api.get(`${API_URL}/rentalRequests/getRentals`, { params: { ownerId, filterParam , sortParam } });
+            const response = await $api.get(`${API_URL}/rental/getRentals`, { params: { ownerId, filterParam , sortParam } });
             return response.data;
         } catch (e) {
             console.log(e.response?.data?.message);
             throw e;
+        }
+    }
+
+    static async cancelRental(rentalId, cancelReason, showToast) {
+     try { 
+        const response = await $api.patch(`${API_URL}/rental/cancelRental`, { rentalId, cancelInputValue: cancelReason });
+        return response.data;
+        
+     } catch (error) {
+        showToast({
+            text1: "Произошла ошибка",
+            type: "error",
+        })
+        console.log(error.response?.data?.message);
+        throw error;
+     }
+    }
+    static async fetchUserData(userId, fields) {
+        try {
+            const response = await $api.get(`${API_URL}/users/getUserInfo`, {
+                params: { userId, fields } // 🔹 JSON-формат
+            });
+            console.log("response", response); 
+            return response.data;
+        } catch (error) {
+            console.log(error.response?.data?.message);
+            throw error;
+        }
+    }
+
+    static async rateUser(userId) {
+        try {
+            const response = await $api.patch(`${API_URL}/users/rateUser`, {
+                ratedId : userId
+            });
+            console.log("response", response);
+            return response.data;
+        } catch (error) {
+            console.log(error.response?.data?.message);
+            throw error;
         }
     }
 }

@@ -1,31 +1,38 @@
-import { useContext, useEffect, useRef } from "react";
-
+import { useContext, useEffect, useLayoutEffect, useRef } from "react";
 import ChatHeader from "./ChatHeader";
 import MessageInput from "./MessageInput";
-
-import "./ChatContainer.css"; // Подключение CSS-файла
+import "./ChatContainer.css"; 
 import { Context } from "../..";
-import { formatMessageTime } from "../../utils/fornatMessageTime";
+import { formatMessageTime } from "../../utils/formatMessageTime";
 import MessageSkeleton from "../skeletons/MessageSkeleton";
 import { observer } from "mobx-react-lite";
+import { PhotoProvider, PhotoView } from "react-photo-view";
+import "react-photo-view/dist/react-photo-view.css"
+
 const ChatContainer = () => {
   const { store, chatStore } = useContext(Context);
-  const messageEndRef = useRef(null);
+  const messagesRef = useRef(null); // Реф на контейнер сообщений
 
   useEffect(() => {
-    chatStore.getMessages(chatStore.selectedUser._id);
-    // subscribeToMessages();
+    // Подключаем сокет при монтировании компонента
+    chatStore.getMessages(chatStore.selectedUser?._id);
+    chatStore.connectSocket();
+    chatStore.subscribeToMessages();
 
-    // return () => unsubscribeFromMessages();
-  }, [chatStore.selectedUser._id, chatStore.getMessages, chatStore.subscribeToMessages, chatStore.unsubscribeFromMessages]);
+    // Отключаем сокет и отписываемся от событий при размонтировании компонента
+    return () => {
+      chatStore.unsubscribeFromMessages();
+      chatStore.disconnectSocket();
+    };
+  }, [chatStore.selectedUser]); // Следим за выбранным пользователем, если нужно
+  // Скролл в самый низ перед первым рендером
+  useLayoutEffect(() => {
+    if (messagesRef.current) {
+      messagesRef.current.scrollTop = messagesRef.current.scrollHeight;
+    }
+  }, [chatStore.messages]); // Завязываемся на сообщения
 
-  // useEffect(() => {
-  //   if (messageEndRef.current && chatStore.messages) {
-  //     messageEndRef.current.scrollIntoView({ behavior: "smooth" });
-  //   }
-  // }, [chatStore.messages]);
-
-  if (!chatStore.messages || chatStore.messages.length === 0) {
+  if (chatStore.isMessagesLoading) {
     return (
       <div className="chat-container">
         <ChatHeader />
@@ -35,41 +42,41 @@ const ChatContainer = () => {
     );
   }
 
-  console.log(store.user.id);
   return (
     <div className="chat-container">
       <ChatHeader />
-
-      <div className="messages-list">
-        {chatStore.messages.map((message) => (
-          <div
-            key={message._id}
-            className={`chat ${message.senderId === store.user.id ? "chat-end" : "chat-start"}`}
-            ref={messageEndRef}
-          >
-            <div className="chat-image avatar">
-              <div className="avatar-wrapper">
-                <img
-                  src={
-                    message.senderId === store.user.id
-                      ? store.user.avatarUrl || "/avatar.png"
-                      : chatStore.selectedUser.avatarUrl || "/avatar.png"
-                  }
-                  alt="profile pic"
-                />
+      <PhotoProvider>
+        <div ref={messagesRef} className="messages-list">
+          {chatStore.messages?.map((message) => (
+            <div
+              key={message._id}
+              className={`chat ${
+                message.senderId === store.user?.id ? "chat-end" : "chat-start"
+              }`}
+            >
+              <div>
+                <time className="message-time">
+                  {formatMessageTime(message.createdAt)}
+                </time>
               </div>
+              {(message.image || message.text) && (
+                <div className="chat-bubble">
+                  {message.image && (
+                    <PhotoView src={message.image}>
+                      <img
+                        src={message.image}
+                        className="message-image"
+                        alt="Sent"
+                      />
+                    </PhotoView>
+                  )}
+                  {message.text && <p>{message.text}</p>}
+                </div>
+              )}
             </div>
-            <div className="chat-header">
-              <time className="message-time">{formatMessageTime(message.createdAt)}</time>
-            </div>
-            <div className="chat-bubble">
-              {message.image && <img src={message.image} alt="Attachment" className="message-image" />}
-              {message.text && <p>{message.text}</p>}
-            </div>
-          </div>
-        ))}
-      </div>
-
+          ))}
+        </div>
+      </PhotoProvider>
       <MessageInput />
     </div>
   );

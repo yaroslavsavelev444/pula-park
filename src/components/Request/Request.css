@@ -4,6 +4,7 @@
     border-radius: 10px;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
     cursor: pointer;
+    position: relative;
   }
   
   .request-item__row {
@@ -106,3 +107,13 @@
       background-color: yellow;
     }
   }
+
+.red-dot{
+  background-color: red;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  position: absolute;
+  top: -5px;
+  right: -5px;
+}

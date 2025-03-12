@@ -253,3 +253,9 @@
   gap: 10px;
   width: 100%;
 }
+
+.requests-mini-wrapper{
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}

@@ -83,13 +83,14 @@ const Cars = () => {
   const [carImages, setCarImages] = useState([])
   const { carId } = useParams();
 
-  const storedStatuses = JSON.parse(localStorage.getItem(process.env.CARS_STORAGE_KEY_STATUSES)) || [];
-  const storedTypes = JSON.parse(localStorage.getItem(process.env.CARS_STORAGE_KEY_TYPES)) || [];
-  const storedSort = localStorage.getItem(process.env.CARS_STORAGE_KEY_SORT) || "dateDesc"; // Оставляем как есть
+  const storedSort = localStorage.getItem('carSortData');
+  const parsedSort = storedSort ? JSON.parse(storedSort) : "dateDesc";
+  const [sortParam, setSortParam] = useState(parsedSort);
 
+  const storedStatuses = JSON.parse(localStorage.getItem('carsStorageKeyStatuses')) || [];
+  const storedTypes = JSON.parse(localStorage.getItem('carsStorageKeyTypes')) || [];
   const [selectedStatuses, setSelectedStatuses] = useState(storedStatuses);
   const [selectedTypes, setSelectedTypes] = useState(storedTypes);
-  const [selectedSort, setSelectedSort] = useState(storedSort);
 
   useEffect(() => {
     if (carId) {
@@ -107,33 +108,33 @@ const Cars = () => {
 
   const handleStatusOptionChange = (value) => {
     setSelectedStatuses(value);
-    localStorage.setItem(process.env.CARS_STORAGE_KEY_STATUSES, JSON.stringify(value));
+    localStorage.setItem('carsStorageKeyStatuses', JSON.stringify(value));
     if (companyStore.company._id !== null) {
       companyStore.fetchCarsData(
         companyStore.company._id,
         value,
         selectedTypes,
-        selectedSort
+        sortParam
       );
     }
   };
 
   const handleTypeOptionChange = (value) => {
     setSelectedTypes(value);
-    localStorage.setItem(process.env.CARS_STORAGE_KEY_TYPES, JSON.stringify(value));
+    localStorage.setItem('carsStorageKeyTypes', JSON.stringify(value));
     if (companyStore.company._id !== null) {
       companyStore.fetchCarsData(
         companyStore.company._id,
         selectedStatuses,
         value,
-        selectedSort
+        sortParam
       );
     }
   };
 
   const handleSortOptionChange = (value) => {
-    setSelectedSort(value);
-    localStorage.setItem(process.env.CARS_STORAGE_KEY_SORT, value); // Просто сохраняем строку
+    setSortParam(value);
+    localStorage.setItem('carSortData', JSON.stringify(value)); // Просто сохраняем строку
     if (companyStore.company._id !== null) {
       companyStore.fetchCarsData(
         companyStore.company._id,
@@ -151,7 +152,7 @@ const Cars = () => {
   };
 
   const handleCheckIsEmailVerified = () => {
-    if (store.user.isActivated === false) {
+    if (!store.user.isActivated) {
       console.log("Подтвердите почту, чтобы создать компанию");
       showToast({
         text1: "Подтвердите почту, чтобы создать компанию",
@@ -205,6 +206,9 @@ const Cars = () => {
       showToast({ text1: "Автомобиль успешно добавлен", type: "success" });
       companyStore.fetchCarsData(companyStore.company._id);
       setIsModalOpen(false);
+      setCarVin("");
+      setCarNumber("");
+      setCarPricePerDay("");
     } catch (error) {
       console.error("Ошибка добавления машины", error);
       showToast({ text1: "Ошибка добавления автомобиля", type: "error" });
@@ -216,10 +220,10 @@ const Cars = () => {
         companyStore.company._id,
         selectedStatuses,
         selectedTypes,
-        selectedSort
+        sortParam
       );
     }
-  }, [companyStore.company?._id]);
+  }, [companyStore.company?._id, sortParam, selectedStatuses, selectedTypes]);
 
   const handleUploadComplete = (newImages) => {
     setCarImages(newImages);
@@ -253,7 +257,7 @@ const Cars = () => {
           <SelectMenu
             options={sortOptions}
             onChange={handleSortOptionChange}
-            value={selectedSort}
+            value={sortParam}
           />
         </div>
         <div className="right-content">

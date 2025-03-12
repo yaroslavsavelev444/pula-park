@@ -5,10 +5,29 @@ import NoChatSelected from '../components/Chat/NoChatSelected';
 import Sidebar from '../components/Chat/Sidebar';
 import '../components/Chat/Chat.css';
 import { observer } from 'mobx-react-lite';
+import { useParams } from 'react-router-dom';
 
-export default observer(function Chats() {
+const Chats = () => {
   const { chatStore } = useContext(Context);
-    const { selectedUser } = chatStore;
+  const { selectedUser, users } = chatStore;
+    const {userId} = useParams();
+
+    useEffect(() => {
+      // Загружаем пользователей, если их нет
+      if (!users.length) {
+        chatStore.getUsers();
+      }
+    }, []);
+
+    useEffect(() => {
+      if (userId && users.length) {
+        const user = users.find((u) => u._id === userId);
+        if (user && user._id !== selectedUser?._id) {
+          chatStore.setSelectedUser(user);
+        }
+      }
+    }, [userId, users]);
+
 
     return (
       <div className="chat-container">
@@ -22,5 +41,7 @@ export default observer(function Chats() {
         </div>
       </div>
     );
-})
+}
+
+export default observer(Chats);
     

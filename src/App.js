@@ -1,5 +1,5 @@
 import React, { useContext, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
@@ -17,6 +17,8 @@ import Loader from "./components/UI/Loader/Loader";
 import { ThemeProvider } from "./providers/ThemeProvider";
 import ResetPassword from "./pages/ResetPassword";
 import Rentals from "./pages/Rentals";
+import User from "./pages/User";
+
 
 const App = observer(() => {
   const { store, companyStore } = useContext(Context);
@@ -69,7 +71,9 @@ const App = observer(() => {
 
               }
               {store.isAuth === true && <Route path="/rentals" element={<Rentals />} />}
+              {store.isAuth === true && <Route path="/user/:userId" element={<User />} />}
               {store.isAuth === true && <Route path="/chats" element={<Chats />} />}
+              {store.isAuth === true && <Route path="/chats/:userId" element={<Chats />} />}
               {store.isAuth === false && <Route path="/reset-password" element={<ResetPassword />} />}
             </Routes>
           )}

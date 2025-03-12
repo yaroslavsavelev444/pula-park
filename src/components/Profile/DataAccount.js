@@ -168,7 +168,7 @@ const Profile = () => {
   };
 
   const fetchBoxData = async () => {
-    companyStore.fetchRequests(ownerId, filterRequests, sortRequests);
+    companyStore.getRequests(ownerId, filterRequests, sortRequests);
   };
 
   const [serverSettings, setServerSettings] = useState({
@@ -204,26 +204,25 @@ const Profile = () => {
   };
 
   useEffect(() => {
-    if (ownerId) {
-      // Фильтруем аренды, которые истекают в ближайшие 5 суток
+    if (ownerId && Array.isArray(companyStore.rentals)) {
       const now = new Date();
       const fiveDaysLater = new Date(now);
       fiveDaysLater.setDate(now.getDate() + 5);
   
       const filteredRentals = companyStore.rentals.filter((rental) => {
         console.log("rental.dates.endDate", rental.dates.endDate);
-        
-        // Преобразуем date и time в один объект Date
+  
         const endDate = new Date(rental.dates.endDate.date);
         const endTime = rental.dates.endDate.time ? new Date(`${rental.dates.endDate.date}T${rental.dates.endDate.time}`) : endDate;
   
         return endTime >= now && endTime <= fiveDaysLater;
       });
   
-      // Сортируем по дате окончания аренды (самая близкая по дате будет первой)
       filteredRentals.sort((a, b) => new Date(a.dates.endDate.date) - new Date(b.dates.endDate.date));
   
       setExpiringRentals(filteredRentals);
+    } else if (!Array.isArray(companyStore.rentals)) {
+      console.log("companyStore.rentals is not an array or not yet loaded.");
     }
   }, [companyStore.rentals, ownerId]);
 

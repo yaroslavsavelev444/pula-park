@@ -12,29 +12,25 @@ const Sidebar = () => {
   console.log("chatStore в Sidebar:", chatStore);
   
   useEffect(() => {
-    if (chatStore) {
-      chatStore.getUsers();
-    }
-  }, [chatStore]);
+    chatStore.getUsers();
+  }, []);
 
   if (chatStore?.isUsersLoading) return <SideBarSkeleton />;
 
   const setSelectedUserHandler = (user) => {
-    if (chatStore && user) {
-      chatStore?.setSelectedUser(user);
-    }
+    if (user) chatStore.setSelectedUser(user);
   };
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
         <div className="sidebar-title">
           <Users className="icon" />
-          <span>Contacts</span>
+          <span>Чаты</span>
         </div>
       </div>
 
       <div className="sidebar-users">
-        {chatStore.users.length > 0 ? (
+        {chatStore.users?.length > 0 ? (
           chatStore.users.map((user) => (
             <button
             style={{width: 'auto'}}
@@ -45,7 +41,7 @@ const Sidebar = () => {
               }`}
             >
               <div className="user-avatar">
-               <img src={user.avatarUrl || "/avatar.png"} alt={user.name} />
+              <img src="/img/no-profile-img.png" alt="User Avatar" />
                 {onlineUsers.includes(user._id) && <span className="user-status" />}
               </div>
               <div className="user-info">

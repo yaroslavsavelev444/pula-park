@@ -11,25 +11,15 @@ import Modal from "../components/UI/Modal/Modal";
 import RentalItem from "../components/Rental/RentalItem";
 import RentalModalContent from "../components/Modals/RentalModalContent";
 
-const options = [
-  { value: "rejected", label: "Отклоненные", color: "#F44336" },
-  { value: "approved", label: "Принятые", color: "#4CAF50" },
-  { value: "pending", label: "Ожидающие", color: "#2196F3" },
-  { value: "cancelledAhead", label: "Отменено вперед", color: "#2196F3" },
+const filterOptions = [
+  { value: "active", label: "Активные", color: "#F44336" },
+  { value: "completed", label: "Завершенные", color: "#4CAF50" },
+  { value: "canceled", label: "Отмененные", color: "#2196F3" },
 ];
 
 const sortOptions = [
-  {
-    value: "dateAsc",
-    label: "По дате создания (по возрастанию)",
-    default: false,
-  },
-  {
-    value: "dateDesc",
-    label: "По дате создания (по убыванию)",
-    default: true,
-    color: "#FF9800",
-  },
+  { value: "dateAsc", label: "По дате (возрастание)" },
+  { value: "dateDesc", label: "По дате (убывание)", default: true },
 ];
 
 const Rentals = () => {
@@ -37,39 +27,36 @@ const Rentals = () => {
   const { store, companyStore } = useContext(Context);
   const { showToast } = useToast();
   const ownerId = companyStore.company ? companyStore.company._id : null;
-  const storedFilters =
-    JSON.parse(
-      localStorage.getItem(process.env.RENTALS_STORAGE_KEY_FILTERS)
-    ) || [];
-  const storedSort =
-    localStorage.getItem(process.env.RENTALS_STORAGE_KEY_SORT) || "dateDesc";
-  const [sortParam, setSortParam] = useState(storedSort);
-  const [filterParam, setFilterParam] = useState(storedFilters);
+  // Загружаем фильтры из localStorage, если они там есть
+  const storedFilters = localStorage.getItem("rentalFilterData");
+  const initialFilters = storedFilters ? JSON.parse(storedFilters) : [];
+  const storedSort = localStorage.getItem("rentalSortData");
+  const initialSort = storedSort ? JSON.parse(storedSort) : "dateDesc";
+  const [sortParam, setSortParam] = useState(initialSort);
+
+  const [filterParam, setFilterParam] = useState(initialFilters);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState(null);
 
-  const handleSortChange = (value) => {
-    if (companyStore.rentals.length > 1) {
-      setSortParam(value);
-      localStorage.setItem(process.env.RENTALS_STORAGE_KEY_SORT, value);
-      if (ownerId !== null) {
-        companyStore.fetchRentals(ownerId, filterParam, value);
-      }
-    }
-  };
-
   const handleFilterChange = (values) => {
     setFilterParam(values);
-    localStorage.setItem(
-      process.env.RENTALS_STORAGE_KEY_FILTERS,
-      JSON.stringify(values)
-    );
-    if (ownerId !== null) {
+    localStorage.setItem("rentalFilterData", JSON.stringify(values));
+    if (ownerId) {
       companyStore.fetchRentals(ownerId, values, sortParam);
     }
   };
 
-  console.log("rentals render");
+  // Функция обновления и сохранения сортировки
+  const handleSortChange = (value) => {
+    if (!companyStore.rentals.length) return;
+    setSortParam(value);
+    localStorage.setItem("rentalSortData", JSON.stringify(value));
+    if (ownerId) {
+      companyStore.fetchRentals(ownerId, filterParam, value);
+    }
+  };
+
+
   useEffect(() => {
     if (ownerId) {
       companyStore.fetchRentals(ownerId, filterParam, sortParam);
@@ -89,11 +76,11 @@ const Rentals = () => {
         </div>
         <div className="left-sort">
           <>
-            <FilterBar
-              options={options}
-              onChange={handleFilterChange}
-              selectedFilters={filterParam}
-            />
+          <FilterBar
+            options={filterOptions}
+            onChange={handleFilterChange}
+            selectedFilters={filterParam}
+          />
           </>
         </div>
       </div>
@@ -129,6 +116,7 @@ const Rentals = () => {
           <RentalModalContent 
           rental={modalContent.rental}
           onClose={() => setIsModalOpen(false)} 
+          showToast={showToast}
           />
           </>
         )}

@@ -4,24 +4,8 @@ import "./RentalItem.css";
 import CarItemBit from "../Car/CarItemBit";
 import UserProfileLight from "../Profile/UserProfileLight";
 import { Clock } from "lucide-react";
-const formatDate = (isoString) => {
-  if (!isoString) return "Неизвестно";
-  const date = new Date(isoString);
-  return date.toLocaleDateString("ru-RU", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
-};
-
-const formatTime = (isoString) => {
-  if (!isoString) return "Неизвестно";
-  const date = new Date(isoString);
-  return date.toLocaleTimeString("ru-RU", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-};
+import { getStatuses } from "../constants/maps";
+import { formatDate, formatTime } from "../../utils/formatMessageTime";
 
 const RentalItem = ({ rental, onClick }) => {
   if (!rental || !rental.rental) {
@@ -42,6 +26,9 @@ const RentalItem = ({ rental, onClick }) => {
             <div className="item-row"> <Clock /> <p> До: </p>{formatDate(rental.dates?.endDate?.date)} {formatTime(rental.dates?.endDate?.time)}</div>
         </p>
       </div>
+      <div className="request-item__row">
+        {getStatuses(rental.status)}
+        </div>
     </div>
   );
 };

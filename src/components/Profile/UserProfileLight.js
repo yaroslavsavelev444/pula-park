@@ -10,7 +10,7 @@ const UserProfileLight = ({ user , actions}) => {
     navigate(`/chats/${user._id}`);
   };
   return (
-    <div className="user-profile-light-card">
+    <div className="user-profile-light-card" onClick={() => navigate(`/user/${user._id}`)}>
       {user?.avatarUrl ? (
         <img src={user.avatarUrl} alt="user avatar" />
       ) : (
@@ -25,7 +25,7 @@ const UserProfileLight = ({ user , actions}) => {
         </div>
         {actions && (
           <div className="user-profile-light-actions">
-          <FiMessageCircle size={20} onClick={handleNavigateToUserChat}/> 
+          <FiMessageCircle size={20} onClick={handleNavigateToUserChat} /> 
           </div>
         )}
         

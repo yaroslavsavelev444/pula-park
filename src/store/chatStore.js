@@ -48,7 +48,6 @@ export default class ChatStore {
   async getUsers(showToast) {
     this.isUsersLoading = true;
     try {
-      this.connectSocket();
       const users = await ChatService.getUsers();
       this.users = users;
       console.log(JSON.stringify(this.users));
@@ -119,13 +118,14 @@ export default class ChatStore {
       query: { userId: user.id },
     });
     this.socket.connect();
-  
+    console.log("Socket connecnet");
     this.socket.on("getOnlineUsers", (userIds) => {
       this.onlineUsers = userIds;
     });
   }
   
   disconnectSocket() {
+    console.log("Socket disconnected");
     if (this.socket?.connected) this.socket.disconnect();
   }
 

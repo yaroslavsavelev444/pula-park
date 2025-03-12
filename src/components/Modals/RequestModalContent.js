@@ -14,12 +14,12 @@ const statusMap = {
   rejected: "Отклонено",
   approved: "Одобрено",
   confirmed: "Подтверждено",
-  cancelledAhead: "Отмена",
+  cancelled: "Отмена",
 };
 
 const nextStatuses = {
   pending: ["rejected", "approved"],
-  approved: ["cancelledAhead", "confirmed"],
+  approved: ["cancelled", "confirmed"],
 };
 
 const RequestModalContent = ({
@@ -97,38 +97,6 @@ const RequestModalContent = ({
         <h1>Выберите дату</h1>
             <CustomDateTimePicker onChange={setStartDate} placeholder={"Начало аренды"}/>
             <CustomDateTimePicker onChange={setEndDate} placeholder={"Конец аренды"} />
-          {startDate && endDate && (
-            <div className="time-line-wrapper">
-              <div className="time-line">
-                <Clock
-                  onClick={() =>
-                    openDateModal(request._id, setStartDate, setEndDate)
-                  }
-                />
-                <p>
-                  {startDate
-                    ? `${new Date(startDate.date).toLocaleDateString()} ${
-                        startDate.time || ""
-                      }`
-                    : "! "}
-                </p>
-              </div>
-              <div className="time-line">
-                <Clock
-                  onClick={() =>
-                    openDateModal(request._id, setStartDate, setEndDate)
-                  }
-                />
-                <p>
-                  {endDate
-                    ? `${new Date(endDate.date).toLocaleDateString()} ${
-                        endDate.time || ""
-                      }`
-                    : "! "}
-                </p>
-              </div>
-            </div>
-          )}
         </>
       )}
       {currentStatus !== "confirmed" && (
@@ -137,7 +105,7 @@ const RequestModalContent = ({
             <Button
               key={nextStatus}
               onClick={() =>
-                nextStatus === "cancelledAhead"
+                nextStatus === "cancelled"
                   ? onCancel(request._id)
                   : currentStatus === "approved"
                   ? handleStatusChange(nextStatus, startDate, endDate)

@@ -32,7 +32,6 @@
 .sidebar {
     width: 20%;
     max-width: 250px;
-    border-right: 1px solid #ddd;
     display: flex;
     flex-direction: column;
     transition: all 0.2s;
@@ -40,7 +39,7 @@
 
 .sidebar-header {
     padding: 20px;
-    border-bottom: 1px solid #ddd;
+
 }
 
 .sidebar-title {
@@ -138,7 +137,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
-
 .user-status-text {
     font-size: 14px;
     color: gray;
@@ -150,7 +148,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.5);
     padding: 40px;
 }
 
@@ -192,5 +189,12 @@
 
 [data-theme="light"] .chat-box {
     background-color: #ffffff;
+    color: black;
+}
+
+[data-theme="dark"] .user-name {
+    color: white;
+}
+[data-theme="light"] .user-name {
     color: black;
 }
