@@ -34,10 +34,7 @@ const RequestModalContent = ({
   const [currentStatus, setCurrentStatus] = useState(status);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
-  const [tempStartDate, setTempStartDate] = useState(null);
-  const [tempEndDate, setTempEndDate] = useState(null);
-
-
+  
   useEffect(() => {
     const handleEsc = (event) => {
       if (event.key === "Escape") {
@@ -74,7 +71,7 @@ const RequestModalContent = ({
         <CarItemBit car={car} />
       </div>
       <div className="request-item__row">
-        <UserProfileLight user={user} />
+        <UserProfileLight user={user} actions={true}/>
       </div>
       <div className="request-item__row">
         <p className="request-item__label">Дата:</p>

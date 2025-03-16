@@ -4,25 +4,7 @@ import "./RentalItem.css";
 import CarItemBit from "../Car/CarItemBit";
 import UserProfileLight from "../Profile/UserProfileLight";
 import { Clock, ArrowRight } from "lucide-react";
-
-const formatDate = (isoString) => {
-  if (!isoString) return "Неизвестно";
-  const date = new Date(isoString);
-  return date.toLocaleDateString("ru-RU", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
-};
-
-const formatTime = (isoString) => {
-  if (!isoString) return "Неизвестно";
-  const date = new Date(isoString);
-  return date.toLocaleTimeString("ru-RU", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-};
+import { formatDate, formatTime } from "../../utils/formatMessageTime";
 
 const RentalItemMini = ({ rental }) => {
   if (!rental || !rental.rental) {
@@ -33,7 +15,7 @@ const RentalItemMini = ({ rental }) => {
     <div className="request-item">
       <div className="request-item__row">
         <CarItemBit car={rental.rental.car} />
-        <UserProfileLight user={rental.rental.user} />
+        <UserProfileLight user={rental.rental.user} actions={true} />
       </div>
       <div className="request-item__row" style={{justifyContent:"center", gap:"10px"}}>
         

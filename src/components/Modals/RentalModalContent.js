@@ -10,30 +10,13 @@ import Input from "../UI/Input/Input";
 import { getRentalCancelReason } from "../constants/maps";
 import { Context } from "../..";
 import "../Rental/RentalItem.css"; 
+import { formatDate, formatTime } from "../../utils/formatMessageTime";
 
 const options = [
     { value: "notCome", label: "Не пришел в офис " },
     { value: "carProblem", label: "Проблемы с автомобилем " },
     { value: "other", label: "Другое " },
 ]
-const formatDate = (isoString) => {
-    if (!isoString) return "Неизвестно";
-    const date = new Date(isoString);
-    return date.toLocaleDateString("ru-RU", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    });
-  };
-
-  const formatTime = (isoString) => {
-    if (!isoString) return "Неизвестно";
-    const date = new Date(isoString);
-    return date.toLocaleTimeString("ru-RU", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
 
   
 const RentalModalContent = ({

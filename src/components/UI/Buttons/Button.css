@@ -66,3 +66,12 @@
   font-size: 16px;
   color: #333;
 }
+
+[data-theme="dark"] .like-count {
+  color: #fff;
+}
+
+
+[data-theme="light"] .like-count {
+  color: #333;
+}

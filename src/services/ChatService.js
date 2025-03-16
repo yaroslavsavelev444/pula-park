@@ -1,4 +1,4 @@
-import $api, { API_URL } from "../http/axios";
+import $api from "../http/axios";
 
 export const ChatService = {
   async getUsers() {

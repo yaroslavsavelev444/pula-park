@@ -30,8 +30,8 @@
 
 /* Sidebar */
 .sidebar {
-    width: 20%;
-    max-width: 250px;
+    width: 30%;
+    max-width: 30%;
     display: flex;
     flex-direction: column;
     transition: all 0.2s;
@@ -70,6 +70,7 @@
 
 
 .user-button {
+    justify-content: space-evenly;
     width: 100%;
     padding: 12px;
     display: flex;
@@ -87,14 +88,14 @@
     background-color: #f0f0f0;
 }
 
-.selected {
-    background-color: #e0e0e0;
+
+[data-theme="dark"] .user-button.selected {
+    background-color: #13222a;
     border-left: 4px solid #007bff;
 }
 
 .user-avatar {
     position: relative;
-    margin-right: 10px;
 }
 
 .user-avatar img {
@@ -118,6 +119,8 @@
 .user-info {
     display: none;
     flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
 }
 .user-info-chat{
     display: flex;
@@ -136,6 +139,8 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    display: block;
+    max-width: 10ch; /* Ограничиваем 10 символами */
 }
 .user-status-text {
     font-size: 14px;

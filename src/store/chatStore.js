@@ -1,8 +1,9 @@
-import { makeAutoObservable, runInAction } from "mobx";
+import { makeAutoObservable, observable, runInAction, toJS } from "mobx";
 import { ChatService } from "../services/ChatService";
 import $api, { API_URL } from "../http/axios";
 import { io } from "socket.io-client";
 import { store } from "..";
+
 export default class ChatStore {
   messages = [];
   users = [];
@@ -13,8 +14,10 @@ export default class ChatStore {
   socket = null;
 
   constructor() {
-    makeAutoObservable(this);
+    makeAutoObservable(this, { messages: observable });
+    this.sendMessage = this.sendMessage.bind(this);
   }
+  
 
   setisMessagesLoading(bool) {
     runInAction(() => {
@@ -44,11 +47,12 @@ export default class ChatStore {
     });
   }
 
-
   async getUsers(showToast) {
+    console.log("getUsers");
     this.isUsersLoading = true;
     try {
       const users = await ChatService.getUsers();
+      console.log(users);
       this.users = users;
       console.log(JSON.stringify(this.users));
     } catch (error) {
@@ -72,15 +76,32 @@ export default class ChatStore {
     } 
   }
 
-  async sendMessage(messageData , selectedUser) {
+  async sendMessage(messageData, selectedUser) {
+    console.log("ChatStore context in sendMessage:", this);
     if (!selectedUser) return;
+    let newMessage = null;
     try {
-      const newMessage = await ChatService.sendMessage(selectedUser._id, messageData);
-      this.messages.push(newMessage);
+        newMessage = await ChatService.sendMessage(selectedUser._id, messageData);
+        if (!newMessage || !newMessage._id) {
+            throw new Error("Сервер вернул некорректный ответ: " + JSON.stringify(newMessage));
+        }
+        console.log("Новое сообщение:", newMessage);
+        runInAction(() => {
+            console.log("newServerMessage", JSON.stringify(newMessage));
+            if (this.setMessages) {
+                this.setMessages([...this.messages, {
+                    ...newMessage,
+                    senderId: newMessage.senderId.toString(),
+                    receiverId: newMessage.receiverId.toString(),
+                }]);
+            } else {
+                console.error("Ошибка: setMessages не определена в ChatStore");
+            }
+        });
     } catch (error) {
-        console.log(error.response?.data?.message || "Ошибка отправки сообщения");
+        console.error("Ошибка в sendMessage:", error);
     }
-  }
+}
 
   subscribeToMessages() {
     if (!this.selectedUser) {
@@ -94,10 +115,19 @@ export default class ChatStore {
     }
   
     this.socket.on("newMessage", (newMessage) => {
+      console.log("newMessage", newMessage);
       if (newMessage.senderId === this.selectedUser?._id) {
-        runInAction(() => {
-          this.messages.push(newMessage);
-        });
+        if (newMessage.senderId === this.selectedUser?._id) {
+          console.log("newSOcketMessage", JSON.stringify(newMessage));
+          
+          runInAction(() => {
+            this.messages.push({
+              ...newMessage,
+              senderId: newMessage.senderId.toString(),
+              receiverId: newMessage.receiverId.toString(),
+            });
+          });
+        }
       }
     });
   }

@@ -18,9 +18,6 @@ const RentalItem = ({ rental, onClick }) => {
         <CarItemBit car={rental.rental.car} />
       </div>
       <div className="request-item__row">
-        <UserProfileLight user={rental.rental.user} />
-      </div>
-      <div className="request-item__row">
         <p className="request-item__value">
             <div className="item-row">  <Clock /> <p> С: </p> {formatDate(rental.dates?.startDate?.date)} {formatTime(rental.dates?.startDate?.time)}</div>
             <div className="item-row"> <Clock /> <p> До: </p>{formatDate(rental.dates?.endDate?.date)} {formatTime(rental.dates?.endDate?.time)}</div>

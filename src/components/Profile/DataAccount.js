@@ -176,7 +176,7 @@ const Profile = () => {
     notificationTO: false,
     notificationNewRequests: false,
   });
-  
+
   useEffect(() => {
     if (ownerId) {
       fetchBoxData();
@@ -186,7 +186,6 @@ const Profile = () => {
       });
     }
   }, [ownerId, store, companyStore]);
-
 
   const handleRequestItemClick = (requestId) => {
     navigate(`/request/${requestId}`, { state: { openModal: requestId } });
@@ -198,7 +197,7 @@ const Profile = () => {
       ...prev,
       [key]: value,
     }));
-  
+
     // Отправка в стор
     store.updateSetting(key, value);
   };
@@ -208,28 +207,36 @@ const Profile = () => {
       const now = new Date();
       const fiveDaysLater = new Date(now);
       fiveDaysLater.setDate(now.getDate() + 5);
-  
+
       const filteredRentals = companyStore.rentals.filter((rental) => {
         console.log("rental.dates.endDate", rental.dates.endDate);
-  
+
         const endDate = new Date(rental.dates.endDate.date);
-        const endTime = rental.dates.endDate.time ? new Date(`${rental.dates.endDate.date}T${rental.dates.endDate.time}`) : endDate;
-  
+        const endTime = rental.dates.endDate.time
+          ? new Date(
+              `${rental.dates.endDate.date}T${rental.dates.endDate.time}`
+            )
+          : endDate;
+
         return endTime >= now && endTime <= fiveDaysLater;
       });
-  
-      filteredRentals.sort((a, b) => new Date(a.dates.endDate.date) - new Date(b.dates.endDate.date));
-  
+
+      filteredRentals.sort(
+        (a, b) =>
+          new Date(a.dates.endDate.date) - new Date(b.dates.endDate.date)
+      );
+
       setExpiringRentals(filteredRentals);
     } else if (!Array.isArray(companyStore.rentals)) {
       console.log("companyStore.rentals is not an array or not yet loaded.");
     }
   }, [companyStore.rentals, ownerId]);
 
-  
   return (
     <div className="wrapper">
-      <div className="box a"></div>
+      <div className="box a">
+        <Empty text={"Содержимого нет"} />
+      </div>
       <div className="box b">
         <UserProfile
           store={store}
@@ -242,30 +249,47 @@ const Profile = () => {
         />
       </div>
       <div className="box c">
-      <h1>Истекающие аренды {expiringRentals.length > 0 ? `(${expiringRentals.length})` : ''}</h1>
-      {expiringRentals.length > 0 ? (
-        <div>
-          {expiringRentals.map((rental) => (
-            <RentalItemMini rental={rental} key={rental._id} showToast={showToast} />
-          ))}
-        </div>
-      ) : (
-        <Empty text={"Заявок нет"} />
-      )}
-    </div>
-      <div className="box d">
-      <h1>Новые заявки {companyStore.requestsList.length > 0 ? `(${companyStore.requestsList.length})` : ''}</h1>
-              {companyStore.requestsList.length > 0 ? (
-          <div className="requests-mini-wrapper">
-            {companyStore.requestsList.map((request) => (
-                <div onClick={() => handleRequestItemClick(request._id)}>
-                  <RequestItemMini key={request._id} request={request} />
-                </div>
-              ))}
+        <h1>
+          Истекающие аренды{" "}
+          {expiringRentals.length > 0 ? `(${expiringRentals.length})` : ""}
+        </h1>
+        {expiringRentals.length > 0 ? (
+          <div>
+            {expiringRentals.map((rental) => (
+              <RentalItemMini
+                rental={rental}
+                key={rental._id}
+                showToast={showToast}
+              />
+            ))}
           </div>
         ) : (
-          <Empty text="У вас нет заявок" />
+          <Empty text={"Заявок нет"} />
         )}
+      </div>
+      <div className="box d">
+        <div>
+          <h1>
+            Новые заявки{" "}
+            {companyStore.requestsList.length > 0
+              ? `(${companyStore.requestsList.length})`
+              : ""}
+          </h1>
+          {companyStore.requestsList.length > 0 ? (
+            <div className="requests-mini-wrapper">
+              {companyStore.requestsList
+  .slice()
+  .reverse()
+  .map((request) => (
+    <div onClick={() => handleRequestItemClick(request._id)} key={request._id}>
+      <RequestItemMini request={request} />
+    </div>
+  ))}
+            </div>
+          ) : (
+            <Empty text="У вас нет заявок" />
+          )}
+        </div>
       </div>
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         {modalContent !== "main" && (
@@ -305,7 +329,9 @@ const Profile = () => {
                 Аккаунт
               </Button>
               <Button onClick={() => setModalContent("system")}>Система</Button>
-              <Button onClick={() => setModalContent("notification")}>Уведомления</Button>
+              <Button onClick={() => setModalContent("notification")}>
+                Уведомления
+              </Button>
               <Button onClick={() => setModalContent("logout")}>Выйти</Button>
             </div>
           </div>
@@ -336,23 +362,27 @@ const Profile = () => {
           </div>
         )}
         {modalContent === "notification" && (
-         <div style={{display:'flex' , flexDirection:'column', gap:10}}>
-          <h1>Настройки уведомлений</h1>
-          <Toggle
-  checked={serverSettings.notificationRequest}
-  onChange={(value) => handleToggleChange("notificationRequest", value)}
-  placeholder="Истекающие заявки"
-/>
-<Toggle
-  checked={serverSettings.notificationTO}
-  onChange={(value) => handleToggleChange("notificationTO", value)}
-  placeholder="Истекающие ТО"
-/>
-<Toggle
-  checked={serverSettings.notificationNewRequests}
-  onChange={(value) => handleToggleChange("notificationNewRequests", value)}
-  placeholder="Новые заявки"
-/>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <h1>Настройки уведомлений</h1>
+            <Toggle
+              checked={serverSettings.notificationRequest}
+              onChange={(value) =>
+                handleToggleChange("notificationRequest", value)
+              }
+              placeholder="Истекающие заявки"
+            />
+            <Toggle
+              checked={serverSettings.notificationTO}
+              onChange={(value) => handleToggleChange("notificationTO", value)}
+              placeholder="Истекающие ТО"
+            />
+            <Toggle
+              checked={serverSettings.notificationNewRequests}
+              onChange={(value) =>
+                handleToggleChange("notificationNewRequests", value)
+              }
+              placeholder="Новые заявки"
+            />
           </div>
         )}
         {modalContent === "system" && (

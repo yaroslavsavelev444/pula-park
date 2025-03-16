@@ -4,10 +4,12 @@ import { Context } from "../..";
 import SideBarSkeleton from "../skeletons/SideBarSkeleton";
 import "./Chat.css";
 import { observer } from "mobx-react-lite";
+import { formatDate, formatTime } from "../../utils/formatMessageTime";
+import { CgProfile } from "react-icons/cg";
 
 
 const Sidebar = () => {
-  const { chatStore } = useContext(Context);
+  const { store, chatStore } = useContext(Context);
   const { onlineUsers } = chatStore;
   console.log("chatStore в Sidebar:", chatStore);
   
@@ -19,6 +21,25 @@ const Sidebar = () => {
 
   const setSelectedUserHandler = (user) => {
     if (user) chatStore.setSelectedUser(user);
+  };
+
+  const lastMessage = (user) => {
+    if (!user?.lastMessage) return null;
+
+    return ( 
+      <div className="user-info">
+        <div className="user-name">
+  {!user.lastMessage ? (
+    "Нет сообщений"
+  ) : (
+    <>
+      {user?.lastMessage?.sender._id === store.user.id ? "Вы: " : ""}
+      {user?.lastMessage?.text}
+    </>
+  )}
+</div>
+      </div>
+    )
   };
   return (
     <aside className="sidebar">
@@ -33,7 +54,6 @@ const Sidebar = () => {
         {chatStore.users?.length > 0 ? (
           chatStore.users.map((user) => (
             <button
-            style={{width: 'auto'}}
               key={user._id}
               onClick={() => setSelectedUserHandler(user)}
               className={`user-button ${
@@ -41,15 +61,14 @@ const Sidebar = () => {
               }`}
             >
               <div className="user-avatar">
-              <img src="/img/no-profile-img.png" alt="User Avatar" />
+              <CgProfile size={50} />
                 {onlineUsers.includes(user._id) && <span className="user-status" />}
               </div>
               <div className="user-info">
                 <div className="user-name">{user.name}</div>
-                <div className="user-status-text">
-                  {onlineUsers.includes(user._id) ? "Online" : "Offline"}
-                </div>
+                <div className="user-name">{lastMessage(user)}</div>
               </div>
+              {formatTime(user?.lastMessage?.createdAt)}
             </button>
           ))
         ) : (

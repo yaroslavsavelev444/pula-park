@@ -1,17 +1,22 @@
-import { useContext, useRef, useState } from "react";
-import { Image, Send, X } from "lucide-react";
+import { useContext, useRef, useState, useEffect } from "react";
+import { ArrowBigDownIcon, ArrowDown, Image, Send, X } from "lucide-react";
 import { Context } from "../..";
 import "./ChatContainer.css";
 import { observer } from "mobx-react-lite";
 import { containsBannedWords } from "../../utils/wordFilter";
 import { useToast } from "../../providers/ToastProvider";
-const MessageInput = () => {
+import Input from "../UI/Input/Input";
+
+const MessageInput = ({isAtBottom, onClick}) => {
   const { chatStore } = useContext(Context);
   const [text, setText] = useState("");
   const { showToast } = useToast();
   const [imagePreview, setImagePreview] = useState(null);
+  const [placeholderText, setPlaceholderText] = useState(""); // Стейт для placeholder
   const fileInputRef = useRef(null);
   const { sendMessage } = chatStore;
+  
+  const placeholderMessage = "Напишите сообщение..."; // Текст для placeholder
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -22,7 +27,6 @@ const MessageInput = () => {
       });
       return;
     }
-
     const reader = new FileReader();
     reader.onloadend = () => {
       setImagePreview(reader.result);
@@ -82,8 +86,34 @@ const MessageInput = () => {
     }
   };
 
+  // Эффект печатающейся машинки с зацикливанием
+  useEffect(() => {
+    let i = 0;
+    const typingInterval = setInterval(() => {
+      setPlaceholderText((prev) => prev + placeholderMessage[i]);
+      i++;
+      if (i === placeholderMessage.length) {
+        clearInterval(typingInterval);
+        setTimeout(() => {
+          setPlaceholderText(""); // Очищаем текст перед повтором
+          i = 0; // Сброс индекса для печати заново
+        }, 1000);
+      }
+    }, 150); // Задержка между символами
+
+    return () => clearInterval(typingInterval); // Очищаем таймер при размонтировании
+  }, []); // Эффект запускается один раз при монтировании компонента
+
   return (
     <div className="message-input">
+      {!isAtBottom && (
+  <button
+    className={`scroll-to-bottom ${!isAtBottom ? "show" : ""}`}
+    onClick={onClick}
+  >
+    <ArrowDown color="white" />
+  </button>
+)}
       {imagePreview && (
         <div className="image-preview">
           <div className="image-container">
@@ -97,7 +127,7 @@ const MessageInput = () => {
               className="remove-image-btn"
               type="button"
             >
-              <X className="remove-icon" />
+              <X className="remove-icon" color="black" />
             </button>
           </div>
         </div>
@@ -105,12 +135,13 @@ const MessageInput = () => {
 
       <form onSubmit={handleSendMessage} className="message-form">
         <div className="input-container">
-          <input
+          <Input
             type="text"
             className="text-input"
-            placeholder="Type a message..."
+            placeholder={"Введите сообщение..."} // Используем state для placeholder
             value={text}
             onChange={(e) => setText(e.target.value)}
+            isPlaceholderAnimated={true}
           />
 
           {/* Скрытый input для файлов */}

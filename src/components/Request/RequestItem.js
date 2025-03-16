@@ -2,13 +2,12 @@ import React from "react";
 import PropTypes from "prop-types";
 import "./Request.css";
 import CarItemBit from "../Car/CarItemBit";
-import UserProfileLight from "../Profile/UserProfileLight";
 import { AlertCircleIcon } from "lucide-react";
 import { getStatuses } from "../constants/maps";
 
 const RequestItem = ({
   request,
-  onClick
+  onClick,
 }) => {
   const { user, car, phone, status, createdAt } = request;
 
@@ -19,9 +18,6 @@ const RequestItem = ({
       )}
       <div className="request-item__row">
         <CarItemBit car={car} />
-      </div>
-      <div className="request-item__row">
-        <UserProfileLight user={user} />
       </div>
       <div className="request-item__row">
         <p className="request-item__label">Дата:</p>
@@ -52,8 +48,6 @@ RequestItem.propTypes = {
     status: PropTypes.string.isRequired,
     createdAt: PropTypes.string.isRequired,
   }).isRequired,
-  onStatusChange: PropTypes.func.isRequired,
-  onCancel: PropTypes.func.isRequired,
 };
 
 export default RequestItem;

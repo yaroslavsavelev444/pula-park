@@ -9,6 +9,7 @@
     display: grid;
     grid-gap: 10px;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-rows: minmax(200px, 200px); /* Фиксированная высота */
     width: 90%;
     height: 75vh;
     margin: 0 auto;
@@ -223,9 +224,24 @@
   flex-direction: row;
   align-items: center;
   gap: 10px;
-  justify-content: space-between;
+  justify-content: space-evenly;
+  border-radius: 15px;
+  width: 100%;
+  padding: 0 2%;
+  
+}
+[data-theme="dark"] .user-profile-light-card{
+background-color: #090909;
 }
 
+[data-theme="light"] .user-profile-light-card{
+  background-color: #8c8c8c;
+  }
+
+  .message-btn-user-profile-light:hover{
+    color: rgb(35, 35, 35);
+    transition: .5 all ease;
+  }
 .user-profile-light-name{
   font-size: 15px;
 }

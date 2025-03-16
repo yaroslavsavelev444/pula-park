@@ -6,14 +6,7 @@ import "../Car/Car.css"; // Подключаем стили
 import Button from "../UI/Buttons/Button";
 import Input from "../UI/Input/Input";
 import { companyStore } from "../..";
-
-const statusOptions = [
-    { value: "available", label: "Доступен" },
-    { value: "unavailable", label: "Недоступен" },
-    { value: "in_use", label: "В прокате" },
-  ];
-
-
+import { getCarStatus } from "../constants/maps";
   
 const CarModalContent = ({ car, onClose, showToast}) => {
   const [pricePerDay, setPricePerDay] = useState(car.rentalOptions.price_per_day);
@@ -46,9 +39,6 @@ const CarModalContent = ({ car, onClose, showToast}) => {
       thumbnailPosition: "bottom", // Размещение миниатюр внизу
       showThumbnails: true, // Показываем только миниатюры
     };
-
-  // Определяем текущий статус
-  const currentStatus = statusOptions.find(option => option.value === car.carStatus?.status) || statusOptions[0];
   
   const handleChangeCarData = () => {
     if(pricePerDay <= 1000 || depositAmount < 0 || pricePerDay < 0 || !pricePerDay) {
@@ -74,7 +64,7 @@ const CarModalContent = ({ car, onClose, showToast}) => {
         >
           <Gallery items={images} showThumbnails={true}  {...galleryOptions}/>
           <>
-            <div className="modal-info-item"><span>Статус:</span> {currentStatus.label}</div>
+            <div className="modal-info-item"><span>Статус:</span> {getCarStatus(car.carStatus.status)}</div>
               <Input value={car.rentalOptions?.price_per_day ? pricePerDay : null}  onChange={(e) => setPricePerDay(e.target.value)} placeholder={'Цена за день'}/>
               <Input value={car.rentalOptions?.deposit_amount ? depositAmount : null}  onChange={(e) => setDepositAmount(e.target.value)}  placeholder={'Депозит'}/>
               {(car.rentalOptions?.price_per_day !== pricePerDay || car.rentalOptions?.deposit_amount !== depositAmount) &&  (

@@ -138,3 +138,16 @@ export const  getRentalCancelReason = (reason) => {
       return reason;
   }
 };
+export const  getCarStatus = (status) => {
+  switch (status) {
+    case 'available':
+      return "Доступен";
+    case 'unavailable':
+      return "Недоступен";
+    case 'in_use':
+      return "В прокате";
+    default:
+      return status;
+  }
+};
+

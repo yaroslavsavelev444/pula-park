@@ -43,10 +43,19 @@ const User = () => {
       }
     };
 
-  const handleNavigateToUserChat = (userId) => {
-    if(!userId) return
-    navigate(`/chats/${userId}`);
-  }
+    const handleNavigateToUserChat = (userId) => {
+      if (!userId) return;
+      
+      navigate(`/chats/${userId}`, { 
+        state: { 
+          user: { 
+            name: companyStore.userData?.name, 
+            avatar: companyStore.userData?.avatar,
+            rating: companyStore.userData?.rating
+          } 
+        } 
+      });
+    };
 
 
   return (
@@ -59,7 +68,7 @@ const User = () => {
         <div className="info-container">
             <UserInfoContainer user={companyStore.userData} />
           <div className="info-card">
-            <h3 className="section-title">Project Status</h3>
+            <h3 className="section-title">Блок статистики</h3>
           </div>
         </div>
       </div>
