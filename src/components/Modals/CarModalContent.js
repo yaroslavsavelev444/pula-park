@@ -6,11 +6,15 @@ import "../Car/Car.css"; // Подключаем стили
 import Button from "../UI/Buttons/Button";
 import Input from "../UI/Input/Input";
 import { companyStore } from "../..";
-import { getCarStatus } from "../constants/maps";
-  
-const CarModalContent = ({ car, onClose, showToast}) => {
-  const [pricePerDay, setPricePerDay] = useState(car.rentalOptions.price_per_day);
-  const [depositAmount, setDepositAmount] = useState(car.rentalOptions.deposit_amount);
+import { getCarClass, getCarShiftBox, getCarStatus, getCarWd, getFuelType, getVehicleType } from "../constants/maps";
+
+const CarModalContent = ({ car, onClose, showToast }) => {
+  const [pricePerDay, setPricePerDay] = useState(
+    car.rentalOptions.price_per_day
+  );
+  const [depositAmount, setDepositAmount] = useState(
+    car.rentalOptions.deposit_amount
+  );
   useEffect(() => {
     const handleEsc = (event) => {
       if (event.key === "Escape") {
@@ -19,36 +23,41 @@ const CarModalContent = ({ car, onClose, showToast}) => {
     };
 
     document.addEventListener("keydown", handleEsc);
-    
+
     return () => {
       document.removeEventListener("keydown", handleEsc);
     };
   }, [onClose]);
 
-// Структура изображений для Gallery
-    const images = car.photos?.map((photo) => ({
-      original: photo,
-      thumbnail: photo,
-    }));
-  
-    // Конфигурация Gallery для отображения только миниатюр
-    const galleryOptions = {
-      showFullscreenButton: true, // Убираем кнопку полноэкранного режима
-      showPlayButton: false, // Убираем кнопку воспроизведения слайдшоу
-      showNav: false, // Убираем навигацию (стрелки)
-      thumbnailPosition: "bottom", // Размещение миниатюр внизу
-      showThumbnails: true, // Показываем только миниатюры
-    };
-  
+  // Структура изображений для Gallery
+  const images = car.photos?.map((photo) => ({
+    original: photo,
+    thumbnail: photo,
+  }));
+
+  // Конфигурация Gallery для отображения только миниатюр
+  const galleryOptions = {
+    showFullscreenButton: true, // Убираем кнопку полноэкранного режима
+    showPlayButton: false, // Убираем кнопку воспроизведения слайдшоу
+    showNav: false, // Убираем навигацию (стрелки)
+    thumbnailPosition: "bottom", // Размещение миниатюр внизу
+    showThumbnails: true, // Показываем только миниатюры
+  };
+
   const handleChangeCarData = () => {
-    if(pricePerDay <= 1000 || depositAmount < 0 || pricePerDay < 0 || !pricePerDay) {
+    if (
+      pricePerDay <= 1000 ||
+      depositAmount < 0 ||
+      pricePerDay < 0 ||
+      !pricePerDay
+    ) {
       showToast({
         text1: "Отредактируйте цену",
         type: "error",
-      })
-      return
+      });
+      return;
     }
-     companyStore.updateCarData(car._id, depositAmount, pricePerDay, showToast); 
+    companyStore.updateCarData(car._id, depositAmount, pricePerDay, showToast);
   };
 
   return (
@@ -58,42 +67,94 @@ const CarModalContent = ({ car, onClose, showToast}) => {
         {car.characteristics?.year})
       </h1>
       <div className="modal-wrapper">
-        <div
-          className="car-modal-gallery"
-
-        >
-          <Gallery items={images} showThumbnails={true}  {...galleryOptions}/>
+        <div className="car-modal-gallery">
+          <Gallery items={images} showThumbnails={true} {...galleryOptions} />
           <>
-            <div className="modal-info-item"><span>Статус:</span> {getCarStatus(car.carStatus.status)}</div>
-              <Input value={car.rentalOptions?.price_per_day ? pricePerDay : null}  onChange={(e) => setPricePerDay(e.target.value)} placeholder={'Цена за день'}/>
-              <Input value={car.rentalOptions?.deposit_amount ? depositAmount : null}  onChange={(e) => setDepositAmount(e.target.value)}  placeholder={'Депозит'}/>
-              {(car.rentalOptions?.price_per_day !== pricePerDay || car.rentalOptions?.deposit_amount !== depositAmount) &&  (
-  <Button onClick={handleChangeCarData}>Сохранить</Button>
-)}
-          </> 
-          
+            <div className="modal-info-item">
+              <span>Статус:</span> {getCarStatus(car.carStatus.status)}
+            </div>
+            <Input
+              value={car.rentalOptions?.price_per_day ? pricePerDay : null}
+              onChange={(e) => setPricePerDay(e.target.value)}
+              placeholder={"Цена за день"}
+            />
+            <Input
+              value={car.rentalOptions?.deposit_amount ? depositAmount : null}
+              onChange={(e) => setDepositAmount(e.target.value)}
+              placeholder={"Депозит"}
+            />
+            {(car.rentalOptions?.price_per_day !== pricePerDay ||
+              car.rentalOptions?.deposit_amount !== depositAmount) && (
+              <Button onClick={handleChangeCarData}>Сохранить</Button>
+            )}
+          </>
         </div>
 
         <div className="modal-info">
           <h4>Детали предложения</h4>
           <div className="modal-info-items">
-            <div className="modal-info-item"><span>Марка:</span> {car.characteristics?.brand}</div>
-            <div className="modal-info-item"><span>Модель:</span> {car.characteristics?.model}</div>
-            <div className="modal-info-item"><span>Год выпуска:</span> {car.characteristics?.year}</div>
-            <div className="modal-info-item"><span>Тип авто:</span> {car.characteristics?.vehicle_type}</div>
-            <div className="modal-info-item"><span>Класс авто:</span> {car.characteristics?.car_class}</div>
-            <div className="modal-info-item"><span>Количество мест:</span> {car.characteristics?.seats}</div>
-            <div className="modal-info-item"><span>Объем багажника:</span> {car.characteristics?.trunk_volume ?? "—"}</div>
-            <div className="modal-info-item"><span>Пробег:</span> {car.characteristics?.mileage} км</div>
-            <div className="modal-info-item"><span>Коробка передач:</span> {car.characteristics?.transmissionType}</div>
-            <div className="modal-info-item"><span>Тип топлива:</span> {car.characteristics?.fuelType}</div>
-            <div className="modal-info-item"><span>Привод:</span> {car.characteristics?.wdType}</div>
-            <div className="modal-info-item"><span>Гос. номер:</span> {car.carData?.licensePlate}</div>
-            <div className="modal-info-item"><span>VIN:</span> {car.carData?.vin}</div>
-            <div className="modal-info-item"><span>Статус:</span> {car.carStatus?.status}</div>
-            <div className="modal-info-item"><span>Забронировано:</span> {car.carStatus?.is_reserved ? "Да" : "Нет"}</div>
-            <div className="modal-info-item"><span>Дата последнего ТО:</span> {car.service?.last_service_date ? new Date(car.service.last_service_date).toLocaleDateString() : "—"}</div>
-            <div className="modal-info-item"><span>Страховка до:</span> {car.service?.insurance_valid_until ? new Date(car.service.insurance_valid_until).toLocaleDateString() : "—"}</div>
+            <div className="modal-info-item">
+              <span>Марка:</span> {car.characteristics?.brand}
+            </div>
+            <div className="modal-info-item">
+              <span>Модель:</span> {car.characteristics?.model}
+            </div>
+            <div className="modal-info-item">
+              <span>Год выпуска:</span> {car.characteristics?.year}
+            </div>
+            <div className="modal-info-item">
+              <span>Тип авто:</span> {getVehicleType(car.characteristics?.vehicle_type)}
+            </div>
+            <div className="modal-info-item">
+              <span>Класс авто:</span> {getCarClass(car.characteristics?.car_class)}
+            </div>
+            <div className="modal-info-item">
+              <span>Количество мест:</span> {car.characteristics?.seats}
+            </div>
+            <div className="modal-info-item">
+              <span>Объем багажника:</span>{" "}
+              {car.characteristics?.trunk_volume ?? "—"}
+            </div>
+            <div className="modal-info-item">
+              <span>Пробег:</span> {car.characteristics?.mileage} км
+            </div>
+            <div className="modal-info-item">
+              <span>Коробка передач:</span>{" "}
+              {getCarShiftBox(car.characteristics?.transmissionType)}
+            </div>
+            <div className="modal-info-item">
+              <span>Тип топлива:</span> {getFuelType(car.characteristics?.fuelType)}
+            </div>
+            <div className="modal-info-item">
+              <span>Привод:</span> {getCarWd(car.characteristics?.wdType)}
+            </div>
+            <div className="modal-info-item">
+              <span>Гос. номер:</span> {car.carData?.licensePlate}
+            </div>
+            <div className="modal-info-item">
+              <span>VIN:</span> {car.carData?.vin}
+            </div>
+            <div className="modal-info-item">
+              <span>Статус:</span> {getCarStatus(car.carStatus?.status)}
+            </div>
+            <div className="modal-info-item">
+              <span>Забронировано:</span>{" "}
+              {car.carStatus?.is_reserved ? "Да" : "Нет"}
+            </div>
+            <div className="modal-info-item">
+              <span>Дата последнего ТО:</span>{" "}
+              {car.service?.last_service_date
+                ? new Date(car.service.last_service_date).toLocaleDateString()
+                : "—"}
+            </div>
+            <div className="modal-info-item">
+              <span>Страховка до:</span>{" "}
+              {car.service?.insurance_valid_until
+                ? new Date(
+                    car.service.insurance_valid_until
+                  ).toLocaleDateString()
+                : "—"}
+            </div>
           </div>
         </div>
       </div>

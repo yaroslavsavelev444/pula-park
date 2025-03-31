@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import Cropper from "react-cropper";
 import "cropperjs/dist/cropper.css";
 import "./CarImagesUpload.css";
+import Button from "../Buttons/Button";
 
 const CarImagesUpload = ({ onSubmit }) => {
   const [images, setImages] = useState([]);
@@ -63,7 +64,7 @@ const CarImagesUpload = ({ onSubmit }) => {
             aspectRatio={4 / 3}
             guides={false}
           />
-          <button onClick={handleCrop}>Обрезать</button>
+          <Button onClick={handleCrop}>Обрезать</Button>
         </div>
       )}
       <div className="image-preview">

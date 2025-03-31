@@ -10,17 +10,10 @@ import Empty from "../components/Empty/Empty";
 import Modal from "../components/UI/Modal/Modal";
 import RentalItem from "../components/Rental/RentalItem";
 import RentalModalContent from "../components/Modals/RentalModalContent";
-
-const filterOptions = [
-  { value: "active", label: "Активные", color: "#F44336" },
-  { value: "completed", label: "Завершенные", color: "#4CAF50" },
-  { value: "canceled", label: "Отмененные", color: "#2196F3" },
-];
-
-const sortOptions = [
-  { value: "dateAsc", label: "По дате (возрастание)" },
-  { value: "dateDesc", label: "По дате (убывание)", default: true },
-];
+import {
+  filterRentalOptions,
+  sortRentalOptions,
+} from "../components/constants/options";
 
 const Rentals = () => {
   const navigate = useNavigate();
@@ -38,6 +31,11 @@ const Rentals = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState(null);
 
+  //Все для динамической пагинации
+  const [isFetching, setIsFetching] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const limit = 10;
+
   const handleFilterChange = (values) => {
     setFilterParam(values);
     localStorage.setItem("rentalFilterData", JSON.stringify(values));
@@ -48,7 +46,7 @@ const Rentals = () => {
 
   // Функция обновления и сохранения сортировки
   const handleSortChange = (value) => {
-    if (!companyStore.rentals.length) return;
+    if (!companyStore?.rentals.length) return;
     setSortParam(value);
     localStorage.setItem("rentalSortData", JSON.stringify(value));
     if (ownerId) {
@@ -57,16 +55,51 @@ const Rentals = () => {
   };
 
 
-  useEffect(() => {
-    if (ownerId) {
-      companyStore.fetchRentals(ownerId, filterParam, sortParam);
-    }
-  }, [ownerId, filterParam, sortParam]);
-
   const handleRentalModal = (rental) => {
     setModalContent({ type: "rentalModal", rental });
     setIsModalOpen(true);
   };
+
+
+  //Динамическая пагинация
+
+  useEffect(() => {
+    if (ownerId) {
+      companyStore.fetchRentals(ownerId, filterParam, sortParam , limit , currentPage);
+    }
+  }, [ownerId, filterParam, sortParam]);
+  
+    useEffect(() => {
+      if (isFetching) {
+        companyStore
+          .fetchRentals(ownerId, filterParam, sortParam , limit , currentPage + 1) // Передаем следующую страницу
+          .then(() => {
+            setCurrentPage(prev => prev + 1);
+            setIsFetching(false);
+          })
+          .catch(() => setIsFetching(false)); // Обязательно сбрасываем состояние при ошибке
+      }
+    }, [isFetching, ownerId, filterParam, sortParam, limit]); 
+  
+    useEffect(() => {
+      document.addEventListener("scroll", scrollHandler);
+      return () => {
+        document.removeEventListener("scroll", scrollHandler);
+      };
+    }, []);
+  
+    const scrollHandler = () => {
+      if (
+        document.documentElement.scrollHeight -
+          (document.documentElement.scrollTop + document.documentElement.clientHeight) <
+          450 &&
+        companyStore?.totalRentals > companyStore?.rentals.length &&
+        !isFetching // Добавляем проверку, чтобы не запускать повторно
+      ) {
+        setIsFetching(true);
+      }
+    };
+  
 
   return (
     <div className="page_wrapper">
@@ -76,26 +109,26 @@ const Rentals = () => {
         </div>
         <div className="left-sort">
           <>
-          <FilterBar
-            options={filterOptions}
-            onChange={handleFilterChange}
-            selectedFilters={filterParam}
-          />
+            <FilterBar
+              options={filterRentalOptions}
+              onChange={handleFilterChange}
+              selectedFilters={filterParam} // Передаем выбранные фильтры
+            />
           </>
         </div>
       </div>
       <div className="right-content-wrapper">
         <div className="right-sort-wrapper">
           <SelectMenu
-            options={sortOptions}
+            options={sortRentalOptions}
             onChange={handleSortChange}
             value={sortParam}
           />
         </div>
-        {companyStore.rentals.length > 0 ? (
+        {companyStore?.rentals.length > 0 ? (
           <div className="right-content">
             <>
-              {companyStore.rentals.map((rental) => (
+              {companyStore?.rentals.map((rental) => (
                 <RentalItem
                   rental={rental}
                   key={rental._id}
@@ -106,18 +139,17 @@ const Rentals = () => {
             </>
           </div>
         ) : (
-          <Empty text={"Заявок нет"} />
+          <Empty text={"Аренд нет"} />
         )}
       </div>
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        {modalContent === "cancelRequestAhead" && <h1>skdjfnsjfs</h1>}
         {modalContent?.type === "rentalModal" && (
-          <> 
-          <RentalModalContent 
-          rental={modalContent.rental}
-          onClose={() => setIsModalOpen(false)} 
-          showToast={showToast}
-          />
+          <>
+            <RentalModalContent
+              rental={modalContent.rental}
+              onClose={() => setIsModalOpen(false)}
+              showToast={showToast}
+            />
           </>
         )}
       </Modal>

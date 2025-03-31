@@ -5,6 +5,7 @@ import { observer } from "mobx-react-lite";
 import UserProfileExtended from "../components/User/UseProfileExtended";
 import "../components/User/User.css";
 import UserInfoContainer from "../components/User/UserInfoContainer";
+import Empty from "../components/Empty/Empty";
 
 const User = () => {
   const { companyStore } = useContext(Context);
@@ -30,8 +31,13 @@ const User = () => {
       if (ownerId && userId) {
         console.log("Fetching user data:", userId, fields);
         companyStore.fetchUserData(userId, fields);
+        console.log("userData", companyStore.userData);
       }
     }, [userId, ownerId, fields, companyStore]);
+
+    if(!companyStore.userData || !ownerId || !userId || userId === undefined){
+      return <div>Loading...</div>
+    }
 
     const toggleRateUser = async (id) => {
       if (!id || !ownerId) return;
@@ -57,21 +63,38 @@ const User = () => {
       });
     };
 
+    const handleToggleBlockUser = async (id) => {
+      if (!id || !ownerId) return;
+      console.log("toggleRateUser", id);
+      try {
+        await companyStore.blockUser(id);
+      } catch (error) {
+        console.error("Error rating user:", error);
+      }
+    };
+
 
   return (
     <div className="profile-wrapper">
-      <div className="profile-container">
-        <div className="profile-card">
-          <UserProfileExtended user={companyStore.userData} toggleRateUser={toggleRateUser} handleNavigateToUserChat={handleNavigateToUserChat} />
+      {companyStore.userData._id ? (
+         <div className="profile-container">
+         <div className="profile-card">
+           <UserProfileExtended user={companyStore.userData} toggleRateUser={toggleRateUser} handleNavigateToUserChat={handleNavigateToUserChat} handleToggleBlockUser={handleToggleBlockUser} companyData={companyStore.company}/>
+         </div>
+ 
+         <div className="info-container">
+             <UserInfoContainer user={companyStore.userData} />
+           <div className="info-card">
+             <h3 className="section-title">Блок статистики</h3>
+           </div>
+         </div>
+       </div>
+      ):
+      (
+        <div>
+          <Empty text="Пользователь не найден" />
         </div>
-
-        <div className="info-container">
-            <UserInfoContainer user={companyStore.userData} />
-          <div className="info-card">
-            <h3 className="section-title">Блок статистики</h3>
-          </div>
-        </div>
-      </div>
+      )}
     </div>
   );
 };

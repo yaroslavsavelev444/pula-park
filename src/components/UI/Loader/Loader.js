@@ -1,10 +1,10 @@
 import RingLoader from "react-spinners/RingLoader";
 
-const Loader = () => {
+const Loader = ({size}) => {
   return (
-    <>
-      <RingLoader color="#007dff" size={50} speedMultiplier={1} />
-    </>
+    <div style={{padding:"20px", display:"flex", justifyContent:"center", alignItems:"center"}}>
+      <RingLoader color="#007dff" size={size} speedMultiplier={1} />
+    </div>
   );
 };
 

@@ -1,9 +1,9 @@
 import React from 'react';
 import Select from 'react-select';
-import "./SelectMenu" ;
+import "./SelectMenu";
 
 // Кастомный компонент Select
-const SelectMenu = ({ options, value, onChange, label }) => {
+const SelectMenu = ({ options, value, onChange, label, placeholder }) => {
   return (
     <div className="select-container">
       {label && <label>{label}</label>}
@@ -14,6 +14,7 @@ const SelectMenu = ({ options, value, onChange, label }) => {
           onChange(selectedOption ? selectedOption.value : '');
         }}
         options={options}
+        placeholder={placeholder || "Выберите..."} 
         styles={{
           control: (base) => ({
             ...base,

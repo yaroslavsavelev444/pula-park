@@ -75,3 +75,65 @@
 [data-theme="light"] .like-count {
   color: #333;
 }
+
+.main-btn{
+  bottom: 5%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  color: white;
+}
+
+.main-download-btn{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.main-download-text{
+  text-align: left;
+}
+.download-buttons {
+  display: flex;
+  gap: 15px;
+  flex-direction: row;
+  margin-top: 20px;
+  width: auto;
+}
+
+.main-download-btn {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  border-radius: 16px;
+  color: white;
+  font-weight: bold;
+  transition: 0.3s ease;
+}
+
+.main-download-btn .main-download-text {
+  margin-left: 10px;
+}
+
+.appstore {
+  background-color: #000;
+}
+
+.googleplay {
+  background-color: #3ddc84;
+}
+
+.main-download-btn:hover {
+  opacity: 0.8;
+}
+.main-download-text p, .main-download-text h4{
+  margin: 0;
+}
+
+.arrow-btn{
+  position: absolute;
+  bottom: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+}

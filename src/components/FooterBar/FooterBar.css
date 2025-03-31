@@ -1,79 +1,108 @@
 .footer {
-    color: black;
-    text-align: center;
-    padding: 1rem 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 20px 20px 0 0;
-  }
+  padding: 1rem 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 20px 20px 0 0;
+}
 
-  [data-theme="dark"] .footer {
-    color: white;
-    background-color: #1e1e1e;
-  }
-  [data-theme="light"] .footer {
-    color: black;
-    background-color: #ffffff;
-  }
-  
-  .back-to-top {
-    position: fixed;
-    bottom: 2rem;
-    right: 2rem;
-    background-color: #007bff;
-    color: #fff;
-    padding: 1rem;
-    border-radius: 50%;
-    border: none;
-    cursor: pointer;
-    display: none;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  }
-  
-  .back-to-top:hover {
-    background-color: #0056b3;
-  }
-  .social-links {
-    display: flex;
-    gap: 15px;
-    padding: 10px;
-  }
-  
-  .icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    text-decoration: none;
-    transition: background 0.3s;
-  }
-  
-  .telegram {
-    background: #0088cc;
-    color: white;
-  }
-  
-  .telegram:hover {
-    background: #0077b5;
-  }
-  
-  .github {
-    background: #333;
-    color: white;
-  }
-  
-  .github:hover {
-    background: #222;
-  }
-  
-  .email {
-    background: #d44638;
-    color: white;
-  }
-  
-  .email:hover {
-    background: #b23121;
-  }
+.footer-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.footer-uni {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  border-bottom: 0.5px solid gray;
+}
+
+.footer-header {
+  padding: 2% 0;
+}
+
+.footer-select-wrapper {}
+
+.footer-body-content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-evenly;
+  width: 60%;
+}
+
+.footer-body {
+  padding: 2% 0 ;
+}
+
+.footer-hrefs,
+.footer-docs {
+  text-align: left;
+}
+
+.footer-bottom-links {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-evenly;
+  gap: 10px;
+}
+
+.footer-bottom {
+  padding: 2% 0;
+}
+
+.footer-footer-content {
+  padding: 1rem;
+  text-align: center;
+}
+
+[data-theme="dark"] .footer {
+  color: white;
+  background-color: #1e1e1e;
+}
+
+[data-theme="light"] .footer {
+  color: black;
+  background-color: #ffffff;
+}
+
+/* Social Media Icons */
+.social-links {
+  display: flex;
+  gap: 15px;
+  padding: 10px;
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  text-decoration: none;
+  transition: background 0.3s;
+}
+.back-to-top {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background-color: #007bff;
+  color: #fff;
+  padding: 1rem;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.back-to-top:hover {
+  background-color: #0056b3;
+}

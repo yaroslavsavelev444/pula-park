@@ -4,12 +4,18 @@ import { Context } from "../..";
 import { useContext } from "react";
 import { observer } from "mobx-react-lite";
 import UserProfileLight from "../Profile/UserProfileLight";
+import {useNavigate, useParams } from "react-router-dom";
 
 const ChatHeader = () => {
   const { chatStore } = useContext(Context);
+  const { userId } = useParams();
+  const navigate = useNavigate();
 
   const handleSetSelectedUser = () => {
     chatStore.setSelectedUser(null);
+    if (userId) {
+      navigate(`/chats`);
+    }
   };
 
   return (

@@ -1,5 +1,5 @@
-import { useContext, useRef, useState, useEffect } from "react";
-import { ArrowBigDownIcon, ArrowDown, Image, Send, X } from "lucide-react";
+import { useContext, useRef, useState } from "react";
+import { ArrowDown, Image, Send, X } from "lucide-react";
 import { Context } from "../..";
 import "./ChatContainer.css";
 import { observer } from "mobx-react-lite";
@@ -12,11 +12,10 @@ const MessageInput = ({isAtBottom, onClick}) => {
   const [text, setText] = useState("");
   const { showToast } = useToast();
   const [imagePreview, setImagePreview] = useState(null);
-  const [placeholderText, setPlaceholderText] = useState(""); // Стейт для placeholder
   const fileInputRef = useRef(null);
   const { sendMessage } = chatStore;
-  
-  const placeholderMessage = "Напишите сообщение..."; // Текст для placeholder
+  const lastMessageTime = useRef(0); // Запоминаем время последней отправки
+
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -38,6 +37,8 @@ const MessageInput = ({isAtBottom, onClick}) => {
 
   const isMessageValid = (text, imagePreview) => {
     const trimmedText = text.trim();
+    const now = Date.now();
+
     if (!trimmedText && !imagePreview) {
       showToast({
         text1: "Нельзя отправить пустое сообщение",
@@ -57,6 +58,10 @@ const MessageInput = ({isAtBottom, onClick}) => {
         text1: "Сообщение содержит запрещённое слово",
         type: "error",
       });
+      return false;
+    }
+    if (now - lastMessageTime.current < process.env.REACT_APP_MESSAGE_COOLDOWN) {
+      showToast({ text1: "Слишком часто отправляете сообщения", type: "error" });
       return false;
     }
     return true;
@@ -81,28 +86,12 @@ const MessageInput = ({isAtBottom, onClick}) => {
       setText("");
       setImagePreview(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
+      lastMessageTime.current = Date.now(); 
+
     } catch (error) {
       console.error("Ошибка отправки сообщения:", error);
     }
   };
-
-  // Эффект печатающейся машинки с зацикливанием
-  useEffect(() => {
-    let i = 0;
-    const typingInterval = setInterval(() => {
-      setPlaceholderText((prev) => prev + placeholderMessage[i]);
-      i++;
-      if (i === placeholderMessage.length) {
-        clearInterval(typingInterval);
-        setTimeout(() => {
-          setPlaceholderText(""); // Очищаем текст перед повтором
-          i = 0; // Сброс индекса для печати заново
-        }, 1000);
-      }
-    }, 150); // Задержка между символами
-
-    return () => clearInterval(typingInterval); // Очищаем таймер при размонтировании
-  }, []); // Эффект запускается один раз при монтировании компонента
 
   return (
     <div className="message-input">

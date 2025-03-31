@@ -15,23 +15,24 @@ import { ArrowLeft } from "lucide-react";
 import ThemeSwitcher from "../UI/ThemeSwitcher/ThemeSwitcher";
 import RequestItemMini from "../Request/RequestItemMini";
 import Toggle from "../UI/Toggle/Toggle";
-import RentalItem from "../Rental/RentalItem";
 import RentalItemMini from "../Rental/RentalItemMini";
+import LogoutModal from "../Modals/LogoutModal";
+import ChangePasswordModalContent from "./ChangePasswordModalContent";
 
 const Profile = () => {
   const { store, companyStore } = useContext(Context);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalContent, setModalContent] = useState(null); // Состояние для контента модалки
+  const [modalContent, setModalContent] = useState(null);
   const [companyName, setCompanyName] = useState("");
   const [companyAddress, setCompanyAddress] = useState("");
   const [companyInn, setCompanyInn] = useState("");
   const [startCompanyWorkTime, setStartCompanyWorkTime] = useState("");
   const [endCompanyWorkTime, setEndCompanyWorkTime] = useState("");
+  const [companyText, setCompanyText] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const userId = store.user.id;
-  const [isUploading, setIsUploading] = useState(false); // Флаг загрузки аватара
-  const navigate = useNavigate(); // Хук для навигации
+  const navigate = useNavigate();
   const [croppedAvatar, setCroppedAvatar] = useState(null);
   const { showToast } = useToast();
   const [oldPassword, setOldPassword] = useState("");
@@ -52,7 +53,10 @@ const Profile = () => {
       console.log("Тип данных avatar:", croppedAvatar);
       const avatarUrl = await handleAvatarUpload(croppedAvatar);
       if (!avatarUrl) {
-        alert("Пожалуйста, загрузите аватар перед отправкой формы.");
+        showToast({
+          text1: "Загрузите логотип компании",
+          type: "warning",
+        });
         return;
       }
 
@@ -64,13 +68,18 @@ const Profile = () => {
         avatarUrl,
         startCompanyWorkTime,
         endCompanyWorkTime,
+        companyText,
       };
-      console.log("SendCompanyData", companyData);
 
-      companyStore.addCompany(companyData, userId);
+      await companyStore.addCompany(companyData, userId, showToast);
       setIsModalOpen(false);
     } catch (error) {
       console.error("Ошибка при отправке формы:", error);
+      showToast({
+        text1: "Ошибка при отправке формы",
+        text2: error.message,
+        type: "warning",
+      });
     }
   };
 
@@ -79,7 +88,6 @@ const Profile = () => {
   };
 
   const handleAvatarUpload = async (avatar) => {
-    setIsUploading(true);
     try {
       if (!avatar) {
         throw new Error("Изображение не выбрано.");
@@ -89,8 +97,6 @@ const Profile = () => {
     } catch (error) {
       console.error("Ошибка загрузки аватара:", error.message);
       return null;
-    } finally {
-      setIsUploading(false);
     }
   };
   const handleResendEmailVerification = async () => {
@@ -203,6 +209,20 @@ const Profile = () => {
   };
 
   useEffect(() => {
+    const handleEsc = (event) => {
+      if (event.key === "Escape") {
+        setIsModalOpen(false); // Закрытие модалки
+      }
+    };
+
+    document.addEventListener("keydown", handleEsc);
+
+    return () => {
+      document.removeEventListener("keydown", handleEsc);
+    };
+  }, []);
+
+  useEffect(() => {
     if (ownerId && Array.isArray(companyStore.rentals)) {
       const now = new Date();
       const fiveDaysLater = new Date(now);
@@ -237,6 +257,7 @@ const Profile = () => {
       <div className="box a">
         <Empty text={"Содержимого нет"} />
       </div>
+      
       <div className="box b">
         <UserProfile
           store={store}
@@ -278,13 +299,16 @@ const Profile = () => {
           {companyStore.requestsList.length > 0 ? (
             <div className="requests-mini-wrapper">
               {companyStore.requestsList
-  .slice()
-  .reverse()
-  .map((request) => (
-    <div onClick={() => handleRequestItemClick(request._id)} key={request._id}>
-      <RequestItemMini request={request} />
-    </div>
-  ))}
+                .slice()
+                .reverse()
+                .map((request) => (
+                  <div
+                    onClick={() => handleRequestItemClick(request._id)}
+                    key={request._id}
+                  >
+                    <RequestItemMini request={request} />
+                  </div>
+                ))}
             </div>
           ) : (
             <Empty text="У вас нет заявок" />
@@ -292,15 +316,11 @@ const Profile = () => {
         </div>
       </div>
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        {modalContent !== "main" && (
+        {modalContent !== "main" && modalContent !== "addCompany" && (
           <ArrowLeft size={20} onClick={handleGoBack} />
         )}
-        {modalContent === "logout" && (
-          <>
-            <h2>Вы точно хотите выйти из аккаунта?</h2>
-            <Button onClick={handleLogout}>Выйти</Button>
-          </>
-        )}
+       <LogoutModal isOpen={modalContent === "logout"} onClose={() => setIsModalOpen(false)} onConfirm={handleLogout} handleGoBack={handleGoBack} />
+
         {modalContent === "addCompany" && (
           <AddCompanyModal
             handleSaveAvatar={handleSaveAvatar}
@@ -319,6 +339,8 @@ const Profile = () => {
             startCompanyWorkTime={startCompanyWorkTime}
             endCompanyWorkTime={endCompanyWorkTime}
             setEndCompanyWorkTime={setEndCompanyWorkTime}
+            companyText={companyText}
+            setCompanyText={setCompanyText}
           />
         )}
         {modalContent === "main" && (
@@ -338,28 +360,15 @@ const Profile = () => {
         )}
 
         {modalContent === "changePassword" && (
-          <div>
-            <h2>Смена пароля</h2>
-            <Input
-              placeholder="Старый пароль"
-              value={oldPassword}
-              onChange={(e) => setOldPassword(e.target.value)}
-              isPassword
-            />
-            <Input
-              placeholder="Новый пароль"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              isPassword
-            />
-            <Input
-              placeholder="Повторите новый пароль"
-              value={repeatPassword}
-              onChange={(e) => setRepeatPassword(e.target.value)}
-              isPassword
-            />
-            <Button onClick={handleChangePassword}>Сохранить</Button>
-          </div>
+         <ChangePasswordModalContent
+            oldPassword={oldPassword}
+            setOldPassword={setOldPassword}
+            newPassword={newPassword}
+            setNewPassword={setNewPassword}
+            repeatPassword={repeatPassword}
+            setRepeatPassword={setRepeatPassword}
+            handleChangePassword={handleChangePassword}
+          />
         )}
         {modalContent === "notification" && (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>

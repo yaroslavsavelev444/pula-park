@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import "../components/Car/Car.css";
 import { useContext, useState } from "react";
 import { Context } from "../index";
@@ -17,45 +17,7 @@ import { uploadImages } from "../utils/ImageOperations/uploadImages";
 import FilterBar from "../components/UI/FilterBar/FilterBar";
 import SelectMenu from "../components/UI/SelectMenu/SelectMenu";
 import Empty from "../components/Empty/Empty";
-
-const statusOptions = [
-  { value: "available", label: "Свободные", color: "#F44336" },
-  { value: "in_use", label: "В прокате", color: "#4CAF50" },
-  { value: "unavailable", label: "Недоступные", color: "#2196F3" },
-];
-
-const typeOptions = [
-  { value: "sedan", label: "Седан", color: "#F44336" },
-  { value: "suv", label: "Кроссовер", color: "#4CAF50" },
-  { value: "truck", label: "Грузовик", color: "#2196F3" },
-  { value: "van", label: "Фургон", color: "#2196F3" },
-];
-
-const sortOptions = [
-  {
-    value: "dateAsc",
-    label: "По дате создания (по возрастанию)",
-    default: false,
-  },
-  {
-    value: "dateDesc",
-    label: "По дате создания (по убыванию)",
-    default: true,
-    color: "#FF9800",
-  },
-  {
-    value: "mileageAsc",
-    label: "По пробегу (по возрастанию)",
-    default: false,
-    color: "#FF9800",
-  },
-  {
-    value: "mileageDesc",
-    label: "По пробегу (по убыванию)",
-    default: false,
-    color: "#FF9800",
-  },
-];
+import { sortOptions, statusOptions, typeOptions } from "../components/constants/options";
 
 const Cars = () => {
   const navigate = useNavigate();
@@ -80,21 +42,28 @@ const Cars = () => {
   const [wdType, setWdType] = useState("fwd");
   const [trunkVolume, setTrunkVolume] = useState("50");
   const { showToast } = useToast();
-  const [carImages, setCarImages] = useState([])
+  const [carImages, setCarImages] = useState([]);
   const { carId } = useParams();
 
-  const storedSort = localStorage.getItem('carSortData');
+  //Все для динамической пагинации
+    const [isFetching, setIsFetching] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const limit = 10;
+
+  const storedSort = localStorage.getItem("carSortData");
   const parsedSort = storedSort ? JSON.parse(storedSort) : "dateDesc";
   const [sortParam, setSortParam] = useState(parsedSort);
 
-  const storedStatuses = JSON.parse(localStorage.getItem('carsStorageKeyStatuses')) || [];
-  const storedTypes = JSON.parse(localStorage.getItem('carsStorageKeyTypes')) || [];
+  const storedStatuses =
+    JSON.parse(localStorage.getItem("carsStorageKeyStatuses")) || [];
+  const storedTypes =
+    JSON.parse(localStorage.getItem("carsStorageKeyTypes")) || [];
   const [selectedStatuses, setSelectedStatuses] = useState(storedStatuses);
   const [selectedTypes, setSelectedTypes] = useState(storedTypes);
 
   useEffect(() => {
     if (carId) {
-      const car = companyStore.cars.find(car => car._id === carId);
+      const car = companyStore.cars.find((car) => car._id === carId);
       if (car) {
         console.log("car", car);
         setCarModalData(car);
@@ -108,7 +77,7 @@ const Cars = () => {
 
   const handleStatusOptionChange = (value) => {
     setSelectedStatuses(value);
-    localStorage.setItem('carsStorageKeyStatuses', JSON.stringify(value));
+    localStorage.setItem("carsStorageKeyStatuses", JSON.stringify(value));
     if (companyStore.company._id !== null) {
       companyStore.fetchCarsData(
         companyStore.company._id,
@@ -121,7 +90,7 @@ const Cars = () => {
 
   const handleTypeOptionChange = (value) => {
     setSelectedTypes(value);
-    localStorage.setItem('carsStorageKeyTypes', JSON.stringify(value));
+    localStorage.setItem("carsStorageKeyTypes", JSON.stringify(value));
     if (companyStore.company._id !== null) {
       companyStore.fetchCarsData(
         companyStore.company._id,
@@ -134,7 +103,7 @@ const Cars = () => {
 
   const handleSortOptionChange = (value) => {
     setSortParam(value);
-    localStorage.setItem('carSortData', JSON.stringify(value)); // Просто сохраняем строку
+    localStorage.setItem("carSortData", JSON.stringify(value)); // Просто сохраняем строку
     if (companyStore.company._id !== null) {
       companyStore.fetchCarsData(
         companyStore.company._id,
@@ -146,8 +115,7 @@ const Cars = () => {
   };
 
   const handleAddCar = () => {
-    console.log("handleAddCar");
-    setModalContent("addCompany");
+    setModalContent("addCar");
     setIsModalOpen(true);
   };
 
@@ -204,7 +172,15 @@ const Cars = () => {
 
       await companyStore.addCar(carData, folderName, ownerData);
       showToast({ text1: "Автомобиль успешно добавлен", type: "success" });
-      companyStore.fetchCarsData(companyStore.company._id);
+      setCurrentPage(1); // Сбрасываем номер страницы
+        companyStore.fetchCarsData(
+          companyStore.company._id,
+          selectedStatuses,
+          selectedTypes,
+          sortParam,
+          limit,
+          1
+        )
       setIsModalOpen(false);
       setCarVin("");
       setCarNumber("");
@@ -214,16 +190,6 @@ const Cars = () => {
       showToast({ text1: "Ошибка добавления автомобиля", type: "error" });
     }
   };
-  useEffect(() => {
-    if (companyStore.company?._id) {
-      companyStore.fetchCarsData(
-        companyStore.company._id,
-        selectedStatuses,
-        selectedTypes,
-        sortParam
-      );
-    }
-  }, [companyStore.company?._id, sortParam, selectedStatuses, selectedTypes]);
 
   const handleUploadComplete = (newImages) => {
     setCarImages(newImages);
@@ -232,6 +198,59 @@ const Cars = () => {
   const handleFetchCarsData = () => {
     companyStore.fetchCarsData(store.user.id);
   };
+
+  //Динамическая пагинация
+  useEffect(() => {
+      if (companyStore.company._id) {
+        setCurrentPage(1); // Сбрасываем номер страницы
+        companyStore.fetchCarsData(
+          companyStore.company._id,
+          selectedStatuses,
+          selectedTypes,
+          sortParam,
+          limit,
+          1
+        )
+      }
+    }, [companyStore.company._id, selectedStatuses, selectedTypes, sortParam, limit]);
+
+      useEffect(() => {
+        if (isFetching) {
+          companyStore
+            .fetchCarsData(
+              companyStore.company._id,
+              selectedStatuses,
+              selectedTypes,
+              sortParam,
+              limit,
+              currentPage + 1
+            )
+            .then(() => {
+              setCurrentPage((prev) => prev + 1);
+              setIsFetching(false);
+            })
+            .catch(() => setIsFetching(false)); 
+        }
+      }, [isFetching, companyStore.company._id, selectedStatuses, selectedTypes, sortParam , limit]);
+    
+      useEffect(() => {
+        document.addEventListener("scroll", scrollHandler);
+        return () => {
+          document.removeEventListener("scroll", scrollHandler);
+        };
+      }, []);
+    
+      const scrollHandler = useCallback(() => {
+        if (
+          document.documentElement.scrollHeight - 
+          (document.documentElement.scrollTop + document.documentElement.clientHeight) < 550 &&
+          companyStore.totalCars > companyStore.cars.length && 
+          !isFetching
+        ) {
+          setIsFetching(true);
+        }
+      }, [isFetching, companyStore.totalCars, companyStore.cars.length]);
+    
 
   return (
     <div className="page_wrapper">
@@ -244,10 +263,12 @@ const Cars = () => {
             <FilterBar
               options={typeOptions}
               onChange={handleTypeOptionChange}
+              selectedFilters={selectedTypes}
             />
             <FilterBar
               options={statusOptions}
               onChange={handleStatusOptionChange}
+              selectedFilters={selectedStatuses}
             />
           </>
         </div>
@@ -261,7 +282,7 @@ const Cars = () => {
           />
         </div>
         <div className="right-content">
-          {companyStore.cars.length > 0 ? (
+          {companyStore.cars?.length > 0 ? (
             <>
               {companyStore.cars.map((car) => (
                 <CarItem
@@ -269,16 +290,25 @@ const Cars = () => {
                   key={car.vin}
                   handleFetchCarsData={handleFetchCarsData}
                   onClick={handleCarModal}
+                  isClickable={true}
                 />
               ))}
+              {isFetching && <Loader />}
+          {companyStore.totalCars <= companyStore.cars?.length && (
+            <Empty text="Конец" />
+          )}
             </>
           ) : (
             <Empty text="Нет автомобилей" />
           )}
         </div>
       </div>
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} fullscreen>
-        {modalContent === "addCompany" && (
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        fullscreen
+      >
+        {modalContent === "addCar" && (
           <>
             <h1>Добавить автомобиль</h1>
             {companyStore.isLoading === true ? (
@@ -411,7 +441,6 @@ const Cars = () => {
               car={carModalData}
               onClose={() => setIsModalOpen(false)}
               showToast={showToast}
-
             />
           </>
         )}

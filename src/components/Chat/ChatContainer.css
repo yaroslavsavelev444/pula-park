@@ -45,6 +45,7 @@
   
   .chat-header {
     margin-bottom: 0.25rem;
+    border-bottom: .8px solid rgb(162, 162, 162);
   }
   
   .message-time {
@@ -67,7 +68,7 @@
     flex-direction: column;
     padding: 0.75rem;
     border-radius: 10px;
-    max-width: 35%;
+    max-width: 90%;
   }
   [data-theme="dark"] .chat-bubble,
   [data-theme="dark"] .chat-header
@@ -249,4 +250,31 @@
 
   .message-input-container{
     position: relative;
+  }
+
+  .message-label{
+    text-align: left;
+    width: 30%;
+    border: .5px solid gray;
+    padding: 2%;
+    border-radius: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    max-width: 100ch;
+margin: 2%;
+  }
+
+  .report-message-wrapper{
+    max-width: 50%;
+    padding: 5%;
+  }
+
+  .modal-report{
+    display: flex;
+    gap: 20px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
   }

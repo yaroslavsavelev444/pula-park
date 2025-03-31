@@ -1,6 +1,7 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import CompanyService from "../services/CompanyService";
 import $api, { API_URL } from "../http/axios";
+import { store } from "..";
 
 class CompanyStore {
   company = {};
@@ -10,6 +11,11 @@ class CompanyStore {
   requests = [];
   rentals = [];
   userData = {};
+  blockedUsers = [];
+  fetchNewCars = false;
+  totalCars = 0;
+  totalRequests = 0;
+  totalRentals = 0;
 
   get carsList() {
     return Array.isArray(this.cars) ? this.cars : [];
@@ -17,10 +23,6 @@ class CompanyStore {
 
   get requestsList() {
     return Object.values(this.requests || {});
-  }
-
-  get carsCount() {
-    return this.carsList.length;
   }
 
   get rentalsList() {
@@ -81,24 +83,58 @@ class CompanyStore {
       console.log("UserData set to:", this.userData);
     });
   }
+  setBlockedUsers(blockedUsers) {
+    runInAction(() => {
+      this.blockedUsers = blockedUsers;
+      console.log("BlockedUsers set to:", this.blockedUsers);
+    });
+  }
+
+  setFetchNewCars(bool) {
+    runInAction(() => {
+      this.fetchNewCars = bool;
+      console.log("fetchNewCars set to:", this.fetchNewCars);
+    });
+  }
+
+  setTotalCars(totalCars) {
+    runInAction(() => {
+      this.totalCars = totalCars;
+      console.log("totalCars set to:", this.totalCars);
+    });
+  }
+
+  setTotalRequests(totalRequests) {
+    runInAction(() => {
+      this.totalRequests = totalRequests;
+      console.log("totalRequests set to:", this.totalRequests);
+    });
+  }
+
+  setTotalRentals(totalRentals) {
+    runInAction(() => {
+      this.totalRentals = totalRentals;
+      console.log("totalRentals set to:", this.totalRentals);
+    });
+  }
 
   //КОМПАНИЯ
 
-  async fetchCompanyData(userId) {
+  async fetchCompanyData() {
     this.setLoading(true);
     try {
-      if (!userId) return;
-      const response = await $api.get(`${API_URL}/parks/getCompanyData`, {
-        params: { userId },
-      });
-      if (response.data) {
-        this.setCompany(response.data);
+      const response = await $api.get(`${API_URL}/parks/getCompanyData`);
+      console.log("response", response.data);
+      console.log(response.data.error);
+      if (!response.data.error) {
+        console.log("response", response.data);
+        this.setCompany(response.data.result);
+        this.setBlockedUsers(response.data.blockedUsers);
         this.setHasCompany(true);
       } else {
         this.setCompany(null);
         this.setHasCompany(false);
       }
-      console.log("response", response);
     } catch (e) {
       console.error("Ошибка при получении данных компании:", e);
       this.setCompany(null);
@@ -108,15 +144,16 @@ class CompanyStore {
     }
   }
 
-  async addCompany(companyData, userId) {
-    this.setLoading(true);
+  async addCompany(companyData, userId, showToast) {
+    this.isLoading = true;
     try {
       const company = await CompanyService.addCompany(companyData, userId);
       this.setCompany(company);
-    } catch (e) {
-      console.error("Ошибка добавления компании:", e);
+      showToast({ text1: "Компания добавлена", type: "success" });
+    } catch (error) {
+      showToast({ text1: "Ошибка", text2: error.message, type: "error" });
     } finally {
-      this.setLoading(false);
+      this.isLoading = false;
     }
   }
 
@@ -184,37 +221,38 @@ class CompanyStore {
       this.setLoading(false);
     }
   }
-  async fetchCarsData(id, selectedStatus, selectedType, selectedSortOptions) {
-    console.log(
-      "fetchCarsData",
-      "id",
-      id,
-      "selectedStatus",
-      selectedStatus,
-      "selectedType",
-      selectedType,
-      "selectedSortOptions",
-      selectedSortOptions
-    );
+  async fetchCarsData(
+    id,
+    selectedStatus,
+    selectedType,
+    selectedSortOptions,
+    limit,
+    page 
+  ) {
     this.setLoading(true);
+    this.setFetchNewCars(true);
     try {
-      console.log(
-        "id",
-        id,
-        "selectedStatus",
-        selectedStatus,
-        "selectedType",
-        selectedType,
-        "selectedSortOptions",
-        selectedSortOptions
-      );
-      const cars = await CompanyService.fetchCarsData(
+      const response = await CompanyService.fetchCarsData(
         id,
         selectedStatus,
         selectedType,
-        selectedSortOptions
+        selectedSortOptions,
+        page,
+        limit
       );
-      this.setCars(cars.data);
+
+      console.log("responsecars", response.data);
+
+      runInAction(() => {
+        if (page === 1) {
+          this.cars = response.data.vehicles; // Обновляем массив, если это первый запрос
+          console.log("thisnew.cars", this.cars);
+        } else {
+          this.cars = [...this.cars, ...response.data.vehicles]; // Добавляем к существующему
+          console.log("thisadd.cars", this.cars);
+        }
+        this.setTotalCars(response.data.total);
+      });
     } catch (e) {
       console.error("Ошибка при получении данных автомобилей:", e);
     } finally {
@@ -223,23 +261,22 @@ class CompanyStore {
   }
 
   // ЗАЯВКИ
-  async getRequests(ownerId, filterParam, sortParam) {
-    console.log(
-      "getRequests",
-      "filterParam",
-      filterParam,
-      "sortParam",
-      sortParam
-    );
+  async getRequests(ownerId, filterParam, sortParam, limit, page) {
+    console.log("getRequests", ownerId, filterParam, sortParam, limit, page);
     this.setLoading(true);
     try {
-      const requests = await CompanyService.getRequests(
-        ownerId,
-        filterParam,
-        sortParam
-      );
-      this.setRequests(requests);
-      console.log("getRequests", requests);
+      const response = await CompanyService.getRequests(ownerId, filterParam, sortParam, limit, page);
+      
+      runInAction(() => {
+        if (page === 1) {
+          this.requests = response.requests; // Обновляем массив, если это первый запрос
+          console.log("thisnew.requests", this.requests);
+        } else {
+          this.requests = [...this.requests, ...response.requests]; // Добавляем к существующему
+          console.log("thisadd.requests", this.requests);
+        }
+        this.setTotalRequests(response.totalRequests);
+      });
     } catch (e) {
       console.error("Ошибка при получении заявок:", e);
     } finally {
@@ -278,19 +315,27 @@ class CompanyStore {
   }
 
   // АРЕНДЫ
-
-  async fetchRentals(ownerId, filterParam, sortParam) {
-
-    console.log('fetchRentals', ownerId, filterParam, sortParam);
+  async fetchRentals(ownerId, filterParam, sortParam, limit, page) {
     this.setLoading(true);
     try {
-      const rentals = await CompanyService.fetchRentals(
+      const response = await CompanyService.fetchRentals(
         ownerId,
         filterParam,
-        sortParam
+        sortParam,
+        limit, page
       );
-      this.setRentals(rentals);
-      console.log("fetchRentals", rentals);
+
+      runInAction(() => {
+        if (page === 1) {
+          this.rentals = response.rentals; // Обновляем массив, если это первый запрос
+          console.log("thisnew.requests", this.rentals);
+        } else {
+          this.rentals = [...this.rentals, ...response.rentals]; // Добавляем к существующему
+          console.log("thisadd.rentals", this.requests);
+        }
+        this.setTotalRentals(response.totalRentals);
+      });
+
     } catch (e) {
       console.error("Ошибка при получении рентал:", e);
     } finally {
@@ -319,7 +364,7 @@ class CompanyStore {
     this.setLoading(true);
     try {
       const userData = await CompanyService.fetchUserData(userId, fields);
-      console.log("StoreGetteduserData", userData);
+      console.log("StorefetchUserData", userData);
       this.setUserData(userData);
     } catch (e) {
       console.error("Ошибка при получении данных автомобилей:", e);
@@ -334,6 +379,22 @@ class CompanyStore {
       await CompanyService.rateUser(userId);
     } catch (e) {
       console.error("Ошибка при получении данных автомобилей:", e);
+    } finally {
+      this.setLoading(false);
+    }
+  }
+
+  async blockUser(id) {
+    this.setLoading(true);
+    try {
+      await CompanyService.blockUser(id);
+      // Обновляем блокированных пользователей
+      await this.fetchCompanyData(store.user.id);
+      runInAction(() => {
+        this.blockedUsers = this.blockedUsers.filter((user) => user.id !== id);
+      });
+    } catch (e) {
+      console.error("Ошибка при блокировке пользователя:", e);
     } finally {
       this.setLoading(false);
     }

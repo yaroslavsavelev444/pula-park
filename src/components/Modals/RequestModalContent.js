@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
 import "react-image-gallery/styles/css/image-gallery.css";
 import PropTypes from "prop-types";
-import "../Car/Car.css"; // Подключаем стили
+import "../Car/Car.css";
 import Button from "../UI/Buttons/Button";
-import Input from "../UI/Input/Input";
 import CarItemBit from "../Car/CarItemBit";
 import UserProfileLight from "../Profile/UserProfileLight";
-import { Clock } from "lucide-react";
 import CustomDateTimePicker from "../UI/CustomDateTimePicker/CustomDateTimePicker";
 
 const statusMap = {

@@ -88,6 +88,8 @@ export const getStatuses = (status) => {
   switch (status) {
     case 'pending':
       return "В ожидании";
+      case 'awaiting':
+        return "Запланирована";
     case 'canceled':
       return "Отменён";
       case 'canceledAhead':
@@ -146,6 +148,8 @@ export const  getCarStatus = (status) => {
       return "Недоступен";
     case 'in_use':
       return "В прокате";
+      case 'awaiting':
+        return "Запланирована";
     default:
       return status;
   }

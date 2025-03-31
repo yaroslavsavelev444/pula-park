@@ -44,19 +44,21 @@ footer {
 [data-theme="light"] .right-content-wrapper, 
 [data-theme="light"] .left-add-car, 
 [data-theme="light"] .left-sort ,
-[data-theme="light"] footer, 
-[data-theme="light"] .header-container 
+[data-theme="light"] footer
 {
   background-color: white;
   color: black;
 }
 
+[data-theme="light"] .header-container {
+  color: black;
+}
 [data-theme="dark"] .car-card {
   background-color: #1e1e1e;
 }
 
 [data-theme="light"] .car-card {
-  background-color: #e8e8e8;
+  background-color: #ffffff;
 }
 
 .App-logo {
@@ -105,7 +107,7 @@ h1{
   min-height: 85vh;
   display: flex;
   gap: 20px;
-  padding: 2%;
+  padding: 0 2%;
   margin: 0;
 }
 
@@ -115,4 +117,13 @@ h1{
   display: flex;
   width: 100%;
   padding: 2%;
+}
+
+.content{
+  display: flex;
+  flex-direction: column;
+  padding-top: 7%;
+  padding-bottom: 5%;
+  overscroll-behavior: contain;
+  scroll-behavior: auto; 
 }

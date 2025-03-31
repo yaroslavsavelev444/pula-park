@@ -1,14 +1,15 @@
 import $api, { API_URL } from "../http/axios";
 
 class CompanyService {
-    static async fetchCompanyData(userId) {
-            return $api.get(`${API_URL}/parks/getCompanyData`, { params: { userId } });
+    static async fetchCompanyData() {
+            return $api.get(`${API_URL}/parks/getCompanyData`);
     }
 
-    static async fetchCarsData(id, selectedStatus, selectedType, selectedSortOptions) {
+    static async fetchCarsData(id, selectedStatus, selectedType, selectedSortOptions, currentPage , limit) {
         const ownerId = id;
+        const page = currentPage;
         try {
-            const response = await $api.get(`${API_URL}/cars/allVehicleData`, { params: { ownerId, selectedStatus, selectedType, selectedSortOptions } });
+            const response = await $api.get(`${API_URL}/cars/allVehicleData`, { params: { ownerId, selectedStatus, selectedType, selectedSortOptions, page, limit } });
             return response.data;
         } catch (e) {
             console.log(e.response?.data?.message);
@@ -33,8 +34,8 @@ class CompanyService {
     static async addCompany(companyData, userId) {
         try {
             const response = await $api.post(`${API_URL}/parks/addCompanyData`, {
-                companyData,  // передаем объект компании
-                userId        // передаем userId как часть body
+                companyData,  
+                userId        
             });
             return response.data;
         } catch (e) {
@@ -88,9 +89,9 @@ class CompanyService {
     }
 
     //ЗАЯВКИ  
-    static async getRequests( ownerId , filterParam , sortParam) {
+    static async getRequests( ownerId , filterParam , sortParam, limit , page) {
         try {
-            const response = await $api.get(`${API_URL}/request/getRequests`, { params: { ownerId, filterParam , sortParam } });
+            const response = await $api.get(`${API_URL}/request/getRequests`, { params: { ownerId, filterParam , sortParam , limit , page} });
             return response.data;
         } catch (e) {
             console.log(e.response?.data?.message);
@@ -118,9 +119,9 @@ class CompanyService {
 
     //Аренда
 
-    static async fetchRentals(ownerId, filterParam , sortParam) {
+    static async fetchRentals(ownerId, filterParam , sortParam, limit, page) {
         try {
-            const response = await $api.get(`${API_URL}/rental/getRentals`, { params: { ownerId, filterParam , sortParam } });
+            const response = await $api.get(`${API_URL}/rental/getRentals`, { params: { ownerId, filterParam , sortParam, limit, page } });
             return response.data;
         } catch (e) {
             console.log(e.response?.data?.message);
@@ -145,9 +146,9 @@ class CompanyService {
     static async fetchUserData(userId, fields) {
         try {
             const response = await $api.get(`${API_URL}/users/getUserInfo`, {
-                params: { userId, fields } // 🔹 JSON-формат
+                params: { userId, fields } 
             });
-            console.log("response", response); 
+            console.log("responsefetchUserData", response); 
             return response.data;
         } catch (error) {
             console.log(error.response?.data?.message);
@@ -167,7 +168,21 @@ class CompanyService {
             throw error;
         }
     }
+
+static async blockUser(id ) {
+    try {
+        const response = await $api.patch(`${API_URL}/users/blockUser`, {
+            blockedUserId : id 
+        });
+        
+        console.log("response", response);
+        return response.data;
+    } catch (error) {
+        console.log(error.response?.data?.message);
+        throw error;
+    }
 }
 
+}
 
 export default CompanyService;

@@ -9,17 +9,28 @@ import ChatHeader from "./ChatHeader";
 import MessageInput from "./MessageInput";
 import "./ChatContainer.css";
 import { Context } from "../..";
-import { formatMessageTime } from "../../utils/formatMessageTime";
 import MessageSkeleton from "../skeletons/MessageSkeleton";
 import { observer } from "mobx-react-lite";
-import { PhotoProvider, PhotoView } from "react-photo-view";
+import { PhotoProvider } from "react-photo-view";
 import "react-photo-view/dist/react-photo-view.css";
+import MessageItem from "./MessageItem";
+import { useToast } from "../../providers/ToastProvider";
+import Modal from "../UI/Modal/Modal";
+import Button from "../UI/Buttons/Button";
+import SelectMenu from "../UI/SelectMenu/SelectMenu";
+import Input from "../UI/Input/Input";
+import { chatOptions } from "../constants/options";
 
 const ChatContainer = () => {
   const { store, chatStore } = useContext(Context);
   const messagesRef = useRef(null);
+  const {showToast } = useToast();
   const [isAtBottom, setIsAtBottom] = useState(true);
   const [lastMessageDate, setLastMessageDate] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalContent, setModalContent] = useState(null);
+  const [menuSelectVisible, setMenuSelectVisible] = useState(false);
+  const [reportReason, setReportReason] = useState(false);
 
   const monthNames = [
     "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", 
@@ -80,6 +91,20 @@ const ChatContainer = () => {
     }
   }, [chatStore.messages, lastMessageDate]);
 
+  const handleSendReportToMessage = (messageId, reason) => {
+    console.log(messageId, reason);
+    if(!messageId || !reason) {
+      console.log("Ошибка: messageId или reason не определены");
+      return;
+    }
+    
+    chatStore.reportToMessage(messageId, reason , showToast);
+  }
+
+  const openModalReport = (message) => {
+    setModalContent({ type: "openModalReport", message });
+    setIsModalOpen(true);
+  };
   if (chatStore.isMessagesLoading) {
     return (
       <div className="chat-container">
@@ -90,7 +115,6 @@ const ChatContainer = () => {
     );
   }
 
-  // Группируем сообщения по дате
   const groupedMessages = chatStore.messages.reduce((acc, message) => {
     const messageDate = formatMessageDate(message.createdAt);
     if (!acc[messageDate]) {
@@ -101,6 +125,8 @@ const ChatContainer = () => {
   }, {});
 
   return (
+    <>
+    
     <div className="chat-container">
       <ChatHeader />
       <PhotoProvider>
@@ -117,43 +143,7 @@ const ChatContainer = () => {
               </div>
               <div  className="messages-list">
               {groupedMessages[date].map((message) => (
-                <div
-                  key={message._id}
-                  className={`chat ${
-                    message.senderId === store.user?.id ? "chat-end" : "chat-start"
-                  }`}
-                >
-                  {message.senderId === store.user?.id && (
-                    <div className="message-time-container">
-                      <time className="message-time">
-                        {formatMessageTime(message.createdAt)}
-                      </time>
-                    </div>
-                  )}
-
-                  {(message.image || message.text) && (
-                    <div className="chat-bubble">
-                      {message.image && (
-                        <PhotoView src={message.image}>
-                          <img
-                            src={message.image}
-                            className="message-image"
-                            alt="Sent"
-                          />
-                        </PhotoView>
-                      )}
-                      {message.text && <p>{message.text}</p>}
-                    </div>
-                  )}
-
-                  {message.senderId !== store.user?.id && (
-                    <div className="message-time-container">
-                      <time className="message-time">
-                        {formatMessageTime(message.createdAt)}
-                      </time>
-                    </div>
-                  )}
-                </div>
+                <MessageItem message={message} store={store} showToast={showToast} openModalReport={openModalReport} />
               ))}
               </div>
             </div>
@@ -163,6 +153,59 @@ const ChatContainer = () => {
 
       <MessageInput onClick={scrollToBottom} isAtBottom={isAtBottom} />
     </div>
+     <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+     {modalContent?.type === "openModalReport" && (
+       <>
+         <h1>Жалоба</h1>
+         <div className="modal-report">
+        <div className="report-message-wrapper">
+          <MessageItem message={modalContent.message} store={store} showToast={showToast} openModalReport={openModalReport}   disableContextMenu={true} />
+         </div>
+         
+         <SelectMenu
+           placeholder="Выберите причину"
+        options={chatOptions}
+          onSelect={(value) => {
+            setMenuSelectVisible(false);
+            console.log(value);
+          }}
+          onClose={() => {
+            setMenuSelectVisible(false);
+            console.log("closed");
+          }}
+          onChange={(value) => {
+            setReportReason(value);
+            console.log(value);
+          }}
+        />
+
+        {reportReason === 'other' && (
+          <div>
+            <Input
+              type="text"
+              placeholder="Причина"
+              value={reportReason}
+              onChange={(e) => setReportReason(e.target.value)}
+            />
+          </div>
+        )}
+
+         <Button
+          onClick={() => {
+            handleSendReportToMessage(modalContent.message._id, reportReason);
+            setIsModalOpen(false);
+          }}
+         >
+           Отправить
+         </Button>
+         </div>
+       </>
+     )}
+
+   </Modal>
+
+   </>
+    
   );
 };
 

@@ -8,7 +8,10 @@ const UserProfileLight = ({ user , actions}) => {
   const navigate = useNavigate(); 
   const handleNavigateToUserChat = (event, userId) => {
     event.stopPropagation(); // Остановка всплытия
-    if (!userId) return;
+    if (!userId) return; // Если userId нет, не переходим
+
+    // Проверка, что userId существует и не является undefined
+    if (userId === undefined) return;
 
     navigate(`/chats/${userId}`, {
       state: {
@@ -20,6 +23,10 @@ const UserProfileLight = ({ user , actions}) => {
       }
     });
   };
+
+  if (!user?._id) {
+    return <div>Loading...</div>; // Можно добавить проверку, если user или userId отсутствуют
+  }
 
   return (
     <div className="user-profile-light-card" onClick={() => navigate(`/user/${user._id}`)}>

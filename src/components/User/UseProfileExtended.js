@@ -1,12 +1,17 @@
-import React from "react";
+import React, { useContext } from "react";
 import { CgProfile } from "react-icons/cg";
-import { Star, MessageCircle, Check, KeyRound, X, Circle, CircleDashed } from "lucide-react";
+import { Star, MessageCircle, Circle, CircleDashed } from "lucide-react";
 import LikeButton from "../UI/Buttons/LikeButton";
-import { MdBookOnline } from "react-icons/md";
+import Button from "../UI/Buttons/Button";
+import {  Context } from "../..";
+import { observer } from "mobx-react-lite";
 
-export default function UserProfileExtended({ user, toggleRateUser, handleNavigateToUserChat }) {
+const UserProfileExtended = ({ user, toggleRateUser, handleNavigateToUserChat, handleToggleBlockUser }) => {
+  const { store } = useContext(Context);
   console.log("User data:", user);
-
+  const { companyStore } = useContext(Context);
+  console.log("Company data:", companyStore.company);
+  console.log("Blocked users:", store?.user);
   if (!user) {
     return <div className="user-profile-extended-card">Пользователь не найден</div>;
   }
@@ -16,7 +21,7 @@ export default function UserProfileExtended({ user, toggleRateUser, handleNaviga
       <div className="profile-avatar">
         {user.avatarUrl ? <img src={user.avatarUrl} alt="User avatar" /> : <CgProfile size={100} />}
       </div>
-      <div className="user-name">
+      <div className="user-name" style={{ maxWidth:"100%"}}>
         <h2>{user.name || "Без имени"} </h2>
         <h2>{user.online ? <Circle size={25} color='green'/> : <CircleDashed size={25} color='gray'/>} </h2>
       </div>
@@ -34,6 +39,15 @@ export default function UserProfileExtended({ user, toggleRateUser, handleNaviga
           <MessageCircle size={20} />
         </button>
       </div>
+      <div className="profile-rating">
+        {companyStore.company?.blockedUsers?.includes(user._id) ? (
+           <Button onClick={() => handleToggleBlockUser(user._id)} className="btn-unblock">Разблокировать</Button>
+        ) : (
+          <Button onClick={() => handleToggleBlockUser(user._id)} className="btn-block" >Заблокировать</Button>
+        )}
+        </div>
     </div>
   );
 }
+
+export default observer(UserProfileExtended);

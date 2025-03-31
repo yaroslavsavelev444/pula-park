@@ -1,25 +1,28 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./FilterBar.css";
 import { SlCheck } from "react-icons/sl";
 import Button from "../Buttons/Button";
 import { MdClear } from "react-icons/md";
 
-const FilterBar = ({ options, onChange }) => {
-  
-  const defaultOption = options.find((option) => option.default)?.value || null;
-  const [selectedFilters, setSelectedFilters] = useState(
-    defaultOption ? [defaultOption] : []
-  );
+const FilterBar = ({ options, onChange, selectedFilters }) => {
+  const [localSelectedFilters, setLocalSelectedFilters] = useState(selectedFilters);
+
+  // Синхронизируем локальное состояние с изменениями в родительском компоненте
+  useEffect(() => {
+    setLocalSelectedFilters(selectedFilters);
+  }, [selectedFilters]);
 
   const toggleFilter = (value) => {
-    setSelectedFilters((prev) =>
-      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
-    );
+    const newSelectedFilters = localSelectedFilters.includes(value)
+      ? localSelectedFilters.filter((v) => v !== value)
+      : [...localSelectedFilters, value];
+    setLocalSelectedFilters(newSelectedFilters);
+    onChange(newSelectedFilters);  // Обновляем родительское состояние
   };
 
-  const applyFilters = () => onChange(selectedFilters);
+  const applyFilters = () => onChange(localSelectedFilters);
   const clearFilters = () => {
-    setSelectedFilters([]);
+    setLocalSelectedFilters([]);
     onChange([]);
   };
 
@@ -30,13 +33,13 @@ const FilterBar = ({ options, onChange }) => {
           key={value}
           onClick={() => toggleFilter(value)}
           className={`filter-button ${
-            selectedFilters.includes(value) ? "active" : ""
+            localSelectedFilters.includes(value) ? "active" : ""
           }`}
           style={{
-            backgroundColor: selectedFilters.includes(value)
+            backgroundColor: localSelectedFilters.includes(value)
               ? color
               : "#f0f0f0",
-            color: selectedFilters.includes(value) ? "#fff" : "#333",
+            color: localSelectedFilters.includes(value) ? "#fff" : "#333",
             borderColor: color,
             width: width || "auto",
           }}
@@ -44,14 +47,6 @@ const FilterBar = ({ options, onChange }) => {
           {label}
         </button>
       ))}
-      <div className="btns-filter-container">
-        <Button onClick={applyFilters} className="apply-button">
-          <SlCheck size={20} style={{ margin: 0 }} />
-        </Button>
-        <Button onClick={clearFilters} className="clear-button" haveBaccol={false}>
-          <MdClear size={20} style={{ margin: 0, color: "red" }} />
-        </Button>
-      </div>
     </div>
   );
 };

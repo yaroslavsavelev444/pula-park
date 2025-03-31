@@ -10,30 +10,14 @@ import FilterBar from "../components/UI/FilterBar/FilterBar";
 import Empty from "../components/Empty/Empty";
 import Input from "../components/UI/Input/Input";
 import Modal from "../components/UI/Modal/Modal";
-import { Button } from "react-bootstrap";
 import CustomDateTimePicker from "../components/UI/CustomDateTimePicker/CustomDateTimePicker";
 import RequestModalContent from "../components/Modals/RequestModalContent";
-
-const options = [
-  { value: "rejected", label: "Отклоненные", color: "#F44336" },
-  { value: "approved", label: "Принятые", color: "#4CAF50" },
-  { value: "pending", label: "Ожидающие", color: "#2196F3" },
-  { value: "cancedlled", label: "Отменено вперед", color: "#2196F3" },
-];
-
-const sortOptions = [
-  {
-    value: "dateAsc",
-    label: "По дате создания (по возрастанию)",
-    default: false,
-  },
-  {
-    value: "dateDesc",
-    label: "По дате создания (по убыванию)",
-    default: true,
-    color: "#FF9800",
-  },
-];
+import Button from "../components/UI/Buttons/Button";
+import {
+  requestOptions,
+  sortRequestOptions,
+} from "../components/constants/options";
+import Loader from "../components/UI/Loader/Loader";
 
 const Request = () => {
   const navigate = useNavigate();
@@ -45,7 +29,6 @@ const Request = () => {
   const storedSort = localStorage.getItem("requestSortData");
   const defaultSort = "dateDesc";
 
-  // Попробуем корректно распарсить сортировку, если она есть
   const parsedSort = storedSort ? JSON.parse(storedSort) : defaultSort;
 
   const [sortParam, setSortParam] = useState(parsedSort);
@@ -53,6 +36,11 @@ const Request = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState(null);
   const [message, setMessage] = useState("");
+
+  const limit = 10;
+  const [isFetching, setIsFetching] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+
   const [selectedCancelledRequestId, setSelectedCancelledRequestId] =
     useState(null);
   const { requestId } = useParams();
@@ -89,28 +77,12 @@ const Request = () => {
     }
   };
 
-  useEffect(() => {
-    if (ownerId) {
-      companyStore.getRequests(ownerId, filterParam, sortParam);
-    }
-  }, [ownerId, filterParam, sortParam]);
-
   const handleRequestStatusChange = (
     requestId,
     newStatus,
     startDate,
     endDate
   ) => {
-    console.log(
-      "requestId",
-      requestId,
-      "newStatus",
-      newStatus,
-      "startDate",
-      startDate,
-      "endDate",
-      endDate
-    );
     if (requestId) {
       if (newStatus === "confirmed") {
         if (alertIfDateIsEmpty(startDate, endDate)) return;
@@ -135,7 +107,16 @@ const Request = () => {
   };
 
   const alertIfDateIsEmpty = (startDate, endDate) => {
-    if (!startDate || !endDate || startDate === "" || endDate === "" || !startDate.date || !endDate.date || !startDate.time || !endDate.time) {
+    if (
+      !startDate ||
+      !endDate ||
+      startDate === "" ||
+      endDate === "" ||
+      !startDate.date ||
+      !endDate.date ||
+      !startDate.time ||
+      !endDate.time
+    ) {
       showToast({
         text1: "Необходимо выбрать даты начала и окончания аренды",
         type: "warning",
@@ -179,6 +160,43 @@ const Request = () => {
     setIsModalOpen(true);
   };
 
+  //Динамическая пагинация
+
+  useEffect(() => {
+    if (ownerId) {
+      companyStore.getRequests(ownerId, filterParam, sortParam, limit, currentPage);
+    }
+  }, [ownerId, filterParam, sortParam]); 
+
+  useEffect(() => {
+    if (isFetching) {
+      companyStore
+        .getRequests(ownerId, filterParam, sortParam, limit, currentPage + 1) // Передаем следующую страницу
+        .then(() => {
+          setCurrentPage(prev => prev + 1);
+          setIsFetching(false);
+        })
+        .catch(() => setIsFetching(false)); // Обязательно сбрасываем состояние при ошибке
+    }
+  }, [isFetching, ownerId, filterParam, sortParam, limit]); 
+
+  useEffect(() => {
+    document.addEventListener("scroll", scrollHandler);
+    return () => {
+      document.removeEventListener("scroll", scrollHandler);
+    };
+  }, []);
+
+  const scrollHandler = () => {
+    console.log('companyStore.totalRequests',  companyStore.totalRequests);
+    console.log('companyStore.requests.length',  companyStore.requests.length);
+    if (
+      document.documentElement.scrollHeight - (document.documentElement.scrollTop + document.documentElement.clientHeight) < 550 && companyStore.totalRequests > companyStore.requests.length && !isFetching
+    ) {
+      setIsFetching(true);
+    }
+  };
+
   return (
     <div className="page_wrapper">
       <div className="left-sidebar">
@@ -188,7 +206,7 @@ const Request = () => {
         <div className="left-sort">
           <>
             <FilterBar
-              options={options}
+              options={requestOptions}
               onChange={handleFilterChange}
               selectedFilters={filterParam}
             />
@@ -198,7 +216,7 @@ const Request = () => {
       <div className="right-content-wrapper">
         <div className="right-sort-wrapper">
           <SelectMenu
-            options={sortOptions}
+            options={sortRequestOptions}
             onChange={handleSortChange}
             value={sortParam}
           />
@@ -215,6 +233,7 @@ const Request = () => {
                   />
                 </>
               ))}
+              {isFetching && <Loader />}
             </>
           </div>
         ) : (

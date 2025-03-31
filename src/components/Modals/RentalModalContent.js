@@ -9,25 +9,15 @@ import Button from "../UI/Buttons/Button";
 import Input from "../UI/Input/Input";
 import { getRentalCancelReason } from "../constants/maps";
 import { Context } from "../..";
-import "../Rental/RentalItem.css"; 
+import "../Rental/RentalItem.css";
 import { formatDate, formatTime } from "../../utils/formatMessageTime";
+import { cancelRentalOptions } from "../constants/options";
 
-const options = [
-    { value: "notCome", label: "Не пришел в офис " },
-    { value: "carProblem", label: "Проблемы с автомобилем " },
-    { value: "other", label: "Другое " },
-]
-
-  
-const RentalModalContent = ({
-  rental,
-  onClose,
-  showToast
-}) => {
-  const {store , companyStore } = useContext(Context);
-    console.log('sdfsdfs', rental);
-    const [cancelReason, setCancelReason] = useState(false);
-    const [cancelRentalVisible, setRentalCancelVisible] = useState(false);
+const RentalModalContent = ({ rental, onClose, showToast }) => {
+  const { store, companyStore } = useContext(Context);
+  console.log("rentalModal", rental);
+  const [cancelReason, setCancelReason] = useState(false);
+  const [cancelRentalVisible, setRentalCancelVisible] = useState(false);
   useEffect(() => {
     const handleEsc = (event) => {
       if (event.key === "Escape") {
@@ -40,65 +30,96 @@ const RentalModalContent = ({
     };
   }, [onClose]);
 
-  
   const handleCancelRental = () => {
     if (cancelReason) {
-      companyStore.cancelRental(rental._id, cancelReason, showToast);
-      setRentalCancelVisible(false);
+      if (rental.status === "canceled" || rental.status === "completed") {
+        showToast({
+          text1: "Вы не можете отменить уже отменённую аренду",
+          type: "error",
+        });
+        console.log("Вы не можете отменить уже отменённую аренду");
+        return;
+      }
+      if (rental.status === "in_use") {
+        showToast({
+          text1: "Вы не можете отменить аренду в прокате",
+          type: "error",
+        });
+        console.log("Вы не можете отменить аренду в прокате");
+        return;
+      } else {
+        companyStore.cancelRental(rental._id, cancelReason, showToast);
+        setRentalCancelVisible(false);
+      }
     }
   };
 
   return (
     <div className="car-modal-content">
       <div className="request-item__row">
-        <CarItemBit car={rental.rental.car} />
+        <CarItemBit car={rental.car} />
       </div>
       <div className="request-item__row">
-        <UserProfileLight user={rental.rental.user} actions={true} />
+        <UserProfileLight user={rental.user} actions={true} />
       </div>
       <div className="request-item__row">
         <p className="request-item__value">
           <div className="item-row">
-            <Clock /> <p> С: </p> {formatDate(rental.dates?.startDate.date)} {formatTime(rental.dates?.startDate.time)}
+            <Clock /> <p> С: </p> {formatDate(rental.dates?.startDate.date)}{" "}
+            {formatTime(rental.dates?.startDate.time)}
           </div>
           <div className="item-row">
-            <Clock /> <p> До: </p> {formatDate(rental.dates?.endDate.date)} {formatTime(rental.dates?.endDate.time)}
+            <Clock /> <p> До: </p> {formatDate(rental.dates?.endDate.date)}{" "}
+            {formatTime(rental.dates?.endDate.time)}
           </div>
         </p>
       </div>
-      {rental.status !== 'canceled' && rental.status !== 'completed' &&  (
-        <div style={{gap:"10px", display:"flex", flexDirection:"column"}}>
-        <Button onClick={() => setRentalCancelVisible(prev => !prev)} haveBaccol={false}>
-          <p style={{ color: "red" }}>Отозвать аренду</p>
-        </Button>   
+      {rental.status !== "canceled" && rental.status !== "completed" && (
+        <div style={{ gap: "10px", display: "flex", flexDirection: "column" }}>
+          <Button
+            onClick={() => setRentalCancelVisible((prev) => !prev)}
+            haveBaccol={false}
+          >
+            <p style={{ color: "red" }}>Отозвать аренду</p>
+          </Button>
         </div>
       )}
-      {rental.status === 'canceled' && (
+      {rental.status === "canceled" && (
         <div className="rental-cancel-data">
-            <p>Аренда отозвана</p>
-            <p>Причина: {getRentalCancelReason(rental?.cancelData?.reason) || "Неизвестно"}</p>
-            <p>Инициатор: { rental?.cancelData?.iniciator === store.user.id ? "Вы" : "Клиент"} </p>
-          </div>
+          <p>Аренда отозвана</p>
+          <p>
+            Причина:{" "}
+            {getRentalCancelReason(rental?.cancelData?.reason) || "Неизвестно"}
+          </p>
+          <p>
+            Инициатор:{" "}
+            {rental?.cancelData?.iniciator === store.user.id ? "Вы" : "Клиент"}{" "}
+          </p>
+        </div>
       )}
-   {cancelRentalVisible && (
-        <div style={{gap:"10px", display:"flex", flexDirection:"column"}}>
-        <SelectMenu
-        options={options}
-          onSelect={(value) => {
-            setRentalCancelVisible(false);
-            console.log(value);
-          }}
-          onClose={() => {
-            setRentalCancelVisible(false);
-            console.log("closed");
-          }}
-          onChange={(value) => {
-            setCancelReason(value);
-            console.log(value);
-          }}
-        />
-        {cancelReason === 'other' && <div ><Input placeholder = "Причина"/></div>}
-        <Button onClick={() => handleCancelRental()}>Подтвердить</Button>
+      {cancelRentalVisible && (
+        <div style={{ gap: "10px", display: "flex", flexDirection: "column" }}>
+          <SelectMenu
+            options={cancelRentalOptions}
+            onSelect={(value) => {
+              setRentalCancelVisible(false);
+              console.log(value);
+            }}
+            onClose={() => {
+              setRentalCancelVisible(false);
+              console.log("closed");
+            }}
+            onChange={(value) => {
+              setCancelReason(value);
+              console.log(value);
+            }}
+          />
+          {cancelReason === "other" && (
+            <div>
+              <Input placeholder="Причина" />
+            </div>
+          )}
+          <Button onClick={() => handleCancelRental()}>Подтвердить</Button>
         </div>
       )}
     </div>

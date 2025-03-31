@@ -6,13 +6,13 @@ import "./Chat.css";
 import { observer } from "mobx-react-lite";
 import { formatDate, formatTime } from "../../utils/formatMessageTime";
 import { CgProfile } from "react-icons/cg";
-
+import SearchInput from "../UI/Search/SearchInput";
 
 const Sidebar = () => {
   const { store, chatStore } = useContext(Context);
   const { onlineUsers } = chatStore;
-  console.log("chatStore в Sidebar:", chatStore);
-  
+  const [searchQuery, setSearchQuery] = useState("");
+
   useEffect(() => {
     chatStore.getUsers();
   }, []);
@@ -26,21 +26,31 @@ const Sidebar = () => {
   const lastMessage = (user) => {
     if (!user?.lastMessage) return null;
 
-    return ( 
+    return (
       <div className="user-info">
-        <div className="user-name">
-  {!user.lastMessage ? (
-    "Нет сообщений"
-  ) : (
-    <>
-      {user?.lastMessage?.sender._id === store.user.id ? "Вы: " : ""}
-      {user?.lastMessage?.text}
-    </>
-  )}
-</div>
+        <div className="last-message">
+          {!user.lastMessage ? (
+            "Нет сообщений"
+          ) : (
+            <>
+              {user?.lastMessage?.sender._id === store.user.id ? "Вы: " : ""}
+              {user?.lastMessage?.text}
+            </>
+          )}
+        </div>
       </div>
-    )
+    );
   };
+
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
+  // Фильтруем пользователей по имени
+  const filteredUsers = chatStore.users?.filter((user) =>
+    user.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
@@ -50,9 +60,16 @@ const Sidebar = () => {
         </div>
       </div>
 
+      {/* Используем универсальный компонент поиска */}
+      <SearchInput
+        value={searchQuery}
+        onChange={handleSearchChange}
+        placeholder="Поиск по имени..."
+      />
+
       <div className="sidebar-users">
-        {chatStore.users?.length > 0 ? (
-          chatStore.users.map((user) => (
+        {filteredUsers?.length > 0 ? (
+          filteredUsers.map((user) => (
             <button
               key={user._id}
               onClick={() => setSelectedUserHandler(user)}
@@ -61,18 +78,20 @@ const Sidebar = () => {
               }`}
             >
               <div className="user-avatar">
-              <CgProfile size={50} />
-                {onlineUsers.includes(user._id) && <span className="user-status" />}
+                <CgProfile size={50} />
+                {onlineUsers.includes(user._id) && (
+                  <span className="user-status" />
+                )}
               </div>
               <div className="user-info">
                 <div className="user-name">{user.name}</div>
-                <div className="user-name">{lastMessage(user)}</div>
+                {lastMessage(user)}
               </div>
               {formatTime(user?.lastMessage?.createdAt)}
             </button>
           ))
         ) : (
-          <div className="no-users">No users</div>
+          <div className="no-users">Нет подходящих пользователей</div>
         )}
       </div>
     </aside>

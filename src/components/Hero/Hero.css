@@ -1,5 +1,47 @@
-.hero{
-  color: black;
-  background-color:lightcyan;
-  min-height: 100vh;
+.main-photo-wrapper{
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: flex-start;
+  height: 100vh;
+}
+
+.main-photo,
+.main-img {
+  flex: 1;
+  width: 50%;
+  height: 100%; /* Чтобы блоки тянулись по высоте */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.text-overlay{
+  width: 50%;
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  align-items: flex-start;
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: left;
+
+  color: white;
+
+}
+
+.color-exam{
+  background-color: red;
+  width: 100%;
+  height: auto;
+}
+
+.main-img img{
+  width: 300px;
+}
+
+.main-img{
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

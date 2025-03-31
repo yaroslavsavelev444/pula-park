@@ -67,7 +67,7 @@ const AvatarUpload = ({ onSubmit }) => {
         </div>
       )}
       {croppedImage && !isCropping && (
-        <div className="avatar-preview">
+        <div className="avatar-preview" style={{justifyContent:"center", padding:"5% 0 "}}>
           <img 
             src={croppedImage} 
             alt="Cropped Avatar" 

@@ -8,6 +8,11 @@
   .cropper-container {
     width: 100%;
     max-width: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 10px;
   }
   
   .image-preview {

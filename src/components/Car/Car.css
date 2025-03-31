@@ -12,6 +12,7 @@
 /* Блок "Добавить машину" */
 .left-add-car, 
 .left-sort {
+  gap: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -44,7 +45,7 @@
   display: flex;
   flex-direction: column;
   border: 1px solid #ddd;
-  border-radius: 8px;
+  border-radius: 13px;
   background: white;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   cursor: pointer;
@@ -52,14 +53,15 @@
 }
 
 .car-card__image {
+  padding: 2%;
   position: relative;
-  width: 100%;
   height: 200px;
   overflow: hidden;
   border-radius: 8px 8px 0 0;
 }
 
 .car-card__image img {
+  border-radius: 10px 10px 0 0 ;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -264,4 +266,117 @@ text-align: left;
   align-items: center;
   justify-content: flex-start;
   width: 100%;
+}
+
+/* Карточка автомобиля на главной странице */
+.car-card-main{
+  width: 100%;
+  max-width: 300px; 
+  position: relative;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #ddd;
+  border-radius: 13px;
+  background: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.car-card__info p {
+  display: flex;
+  align-items: center;
+}
+
+.point {
+  width: 10px;
+  height: 10px;
+  background-color: #ffd500; /* Цвет точки */
+  border-radius: 50%;
+  margin-right: 10px;
+}
+.point-green{
+  width: 10px;
+  height: 10px;
+  background-color: green; /* Цвет точки */
+  border-radius: 50%;
+  margin-right: 10px; 
+}
+
+.car-info-bit p {
+  margin: 0;
+  padding: 0;
+}
+
+.car-info-bit {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.car-card__pricing {
+  margin-top: 20px;
+}
+
+.price-per-day, .deposit-amount {
+  margin: 5px 0;
+}
+
+.car-info-bit-wrapper {
+  padding: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+.car-info-bit-wrapper h3 {
+  text-align: left;
+  margin: 5px 0;
+}
+
+.car-info-bit-wrapper p {
+  margin: 3px 0;
+  font-size: 14px;
+  color: #555;
+  display: flex;
+  align-items: center;
+}
+
+.car-card-pricing-main{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-evenly;
+  gap: 10px;
+  padding: 5% 0;
+}
+.price-per-day-main , .deposit-amount-main{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding:  2% 5%;
+  text-align: center;
+  background-color: #ff9900;
+  border-radius: 15px;
+  font-size: 20px;
+  font-weight: 500;
+  color: white;
+  
+}
+
+.price-per-day-main {
+  background-color: #ff9900;
+} 
+
+.deposit-amount-main {
+  background-color: #555;
+}
+
+.line{
+  width: 100%;
+  height: .1px;
+  border: none;
+  background-color: lightgray;
+  margin: 0;
 }

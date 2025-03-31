@@ -8,14 +8,15 @@ import { getStatuses } from "../constants/maps";
 import { formatDate, formatTime } from "../../utils/formatMessageTime";
 
 const RentalItem = ({ rental, onClick }) => {
-  if (!rental || !rental.rental) {
+  console.log('rental', rental);
+  if (!rental || !rental) {
     return <p className="request-item">Данные аренды недоступны</p>;
   }
 
   return (
     <div className="request-item" onClick={() => onClick(rental)}>
       <div className="request-item__row">
-        <CarItemBit car={rental.rental.car} />
+        <CarItemBit car={rental.car} />
       </div>
       <div className="request-item__row">
         <p className="request-item__value">

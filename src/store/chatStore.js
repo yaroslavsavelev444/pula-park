@@ -76,6 +76,30 @@ export default class ChatStore {
     } 
   }
 
+
+
+  async reportToMessage (messageId, reason , showToast) {
+    try {
+      if(!messageId || !reason) {
+        console.log("Ошибка: messageId или reason не определены");
+        return;
+      }
+      const res = await $api.post(`/chats/report` , {messageId , reason});
+      if(res.status === 200) {
+        showToast({
+          text1: "Сообщение отправлено администратору",
+          type: "success",
+        });
+      }
+    } catch (error) {
+      console.error("Ошибка при получении сообщений:", error);
+      showToast({
+        text1: error.response?.data || "Неизвестная ошибка",
+        type: "error",
+      })
+    } 
+  }
+
   async sendMessage(messageData, selectedUser) {
     console.log("ChatStore context in sendMessage:", this);
     if (!selectedUser) return;

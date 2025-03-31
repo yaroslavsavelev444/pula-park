@@ -160,6 +160,23 @@
     gap: 10px;
   }
 
+  .time-input{
+    width: 60px;
+  }
+
+  .time-inputs-container{
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .label-timepicker{
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
   .modal-input{
     width: 100%;
   }
@@ -198,7 +215,7 @@
   .avatar-preview{
     width: 100%;
     display: flex;
-    justify-content: flex-start;
+    justify-content: center;
     align-items: center;
     flex-direction: row;
     gap: 10px;
@@ -275,3 +292,12 @@ background-color: #090909;
   flex-direction: column;
   gap: 20px;
 }
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.7; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.pulsing-icon {
+cursor: pointer;}
