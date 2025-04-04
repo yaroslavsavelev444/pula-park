@@ -20,6 +20,7 @@ const Sidebar = () => {
   if (chatStore?.isUsersLoading) return <SideBarSkeleton />;
 
   const setSelectedUserHandler = (user) => {
+    chatStore.setSelectedUser(null);
     if (user) chatStore.setSelectedUser(user);
   };
 
@@ -51,6 +52,9 @@ const Sidebar = () => {
     user.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const botUser = { _id: chatStore.botId !== null ? chatStore.botId  : console.log("chatStore.botId null")  , name: "Нейро-поддержка" , isChatBot:true };
+
+
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
@@ -68,6 +72,16 @@ const Sidebar = () => {
       />
 
       <div className="sidebar-users">
+      {!chatStore.hasBotChat && <button
+      key={botUser._id}
+      onClick={() => setSelectedUserHandler(botUser)}
+      className={`user-button ${chatStore.selectedUser?.isChatBot? "selected" : ""}`}
+    >
+      <div style={{textAlign:'left', margin: 0 , padding: 0}}>
+        <h3 style={{margin:5}}>Остались вопросы? </h3>
+        <p style={{margin:5}}>Спросите нейро-асссистента ! </p>
+      </div>
+    </button>}
         {filteredUsers?.length > 0 ? (
           filteredUsers.map((user) => (
             <button

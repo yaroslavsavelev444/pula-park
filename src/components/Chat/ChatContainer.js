@@ -37,15 +37,16 @@ const ChatContainer = () => {
     "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
   ];
 
-  useEffect(() => {
-    chatStore.getMessages(chatStore.selectedUser?._id);
-    chatStore.connectSocket();
-    chatStore.subscribeToMessages();
 
-    return () => {
-      chatStore.unsubscribeFromMessages();
-      chatStore.disconnectSocket();
-    };
+  useEffect(() => {
+      chatStore.getMessages(chatStore.selectedUser?._id);
+      chatStore.connectSocket();
+      chatStore.subscribeToMessages();
+  
+      return () => {
+        chatStore.unsubscribeFromMessages();
+        chatStore.disconnectSocket();
+      };
   }, [chatStore.selectedUser]);
 
   const handleScroll = () => {
@@ -74,8 +75,6 @@ const ChatContainer = () => {
     const messageDate = new Date(date);
     const messageDay = messageDate.getDate();
     const messageMonth = monthNames[messageDate.getMonth()]; // Месяц в словесном формате
-    const messageYear = messageDate.getFullYear();
-
     return `${messageDay} ${messageMonth}`;
   };
 
@@ -151,7 +150,7 @@ const ChatContainer = () => {
         </div>
       </PhotoProvider>
 
-      <MessageInput onClick={scrollToBottom} isAtBottom={isAtBottom} />
+      <MessageInput onClick={scrollToBottom} isAtBottom={isAtBottom} isAi={chatStore.selectedUser.isChatBot} />
     </div>
      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
      {modalContent?.type === "openModalReport" && (

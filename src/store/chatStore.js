@@ -12,6 +12,8 @@ export default class ChatStore {
   isMessagesLoading = false;
   onlineUsers = [];
   socket = null;
+  hasBotChat = null;
+  botId = null;
 
   constructor() {
     makeAutoObservable(this, { messages: observable });
@@ -53,8 +55,10 @@ export default class ChatStore {
     try {
       const users = await ChatService.getUsers();
       console.log(users);
-      this.users = users;
-      console.log(JSON.stringify(this.users));
+      this.users = users.users;
+      this.hasBotChat = users.hasBotChat;
+      this.botId = users.botId;
+      console.log('this.users', JSON.stringify(this.users));
     } catch (error) {
       console.log(error.response?.data?.message || "Ошибка загрузки пользователей");
     } finally {

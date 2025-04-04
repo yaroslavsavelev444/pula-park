@@ -7,7 +7,7 @@ import { containsBannedWords } from "../../utils/wordFilter";
 import { useToast } from "../../providers/ToastProvider";
 import Input from "../UI/Input/Input";
 
-const MessageInput = ({isAtBottom, onClick}) => {
+const MessageInput = ({ isAtBottom, onClick, isAi }) => {
   const { chatStore } = useContext(Context);
   const [text, setText] = useState("");
   const { showToast } = useToast();
@@ -15,7 +15,6 @@ const MessageInput = ({isAtBottom, onClick}) => {
   const fileInputRef = useRef(null);
   const { sendMessage } = chatStore;
   const lastMessageTime = useRef(0); // Запоминаем время последней отправки
-
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -60,8 +59,14 @@ const MessageInput = ({isAtBottom, onClick}) => {
       });
       return false;
     }
-    if (now - lastMessageTime.current < process.env.REACT_APP_MESSAGE_COOLDOWN) {
-      showToast({ text1: "Слишком часто отправляете сообщения", type: "error" });
+    if (
+      now - lastMessageTime.current <
+      process.env.REACT_APP_MESSAGE_COOLDOWN
+    ) {
+      showToast({
+        text1: "Слишком часто отправляете сообщения",
+        type: "error",
+      });
       return false;
     }
     return true;
@@ -86,8 +91,7 @@ const MessageInput = ({isAtBottom, onClick}) => {
       setText("");
       setImagePreview(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
-      lastMessageTime.current = Date.now(); 
-
+      lastMessageTime.current = Date.now();
     } catch (error) {
       console.error("Ошибка отправки сообщения:", error);
     }
@@ -95,14 +99,14 @@ const MessageInput = ({isAtBottom, onClick}) => {
 
   return (
     <div className="message-input">
-      {!isAtBottom && (
-  <button
-    className={`scroll-to-bottom ${!isAtBottom ? "show" : ""}`}
-    onClick={onClick}
-  >
-    <ArrowDown color="white" />
-  </button>
-)}
+      {!isAtBottom && !isAi &&  (
+        <button
+          className={`scroll-to-bottom ${!isAtBottom ? "show" : ""}`}
+          onClick={onClick}
+        >
+          <ArrowDown color="white" />
+        </button>
+      )}
       {imagePreview && (
         <div className="image-preview">
           <div className="image-container">
@@ -134,13 +138,16 @@ const MessageInput = ({isAtBottom, onClick}) => {
           />
 
           {/* Скрытый input для файлов */}
-          <input
-            type="file"
-            accept="image/*"
-            ref={fileInputRef}
-            onChange={handleImageChange}
-            style={{ display: "none" }} // Полностью скрываем инпут
-          />
+
+          {!isAi && (
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              onChange={handleImageChange}
+              style={{ display: "none" }} // Полностью скрываем инпут
+            />
+          )}
 
           {/* Кнопка для выбора файла (иконка вместо стандартной формы) */}
           <button
@@ -148,7 +155,7 @@ const MessageInput = ({isAtBottom, onClick}) => {
             className={`image-btn ${imagePreview ? "active" : ""}`}
             onClick={() => fileInputRef.current?.click()}
           >
-            <Image size={20} />
+            {!isAi && <Image size={20} />}
           </button>
         </div>
 

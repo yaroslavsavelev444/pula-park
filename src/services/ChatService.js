@@ -2,7 +2,7 @@ import $api from "../http/axios";
 
 export const ChatService = {
   async getUsers() {
-    const res = await $api.get("/chats/users");
+    const res = await $api.get("/chats/getChats");
     return res.data;
   },
 

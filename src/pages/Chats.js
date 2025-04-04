@@ -7,6 +7,7 @@ import "../components/Chat/Chat.css";
 import { observer } from "mobx-react-lite";
 import { useLocation, useParams } from "react-router-dom";
 import UserBlocked from "../components/Chat/UserBlocked";
+import ChatBotWindow from "../components/Chat/ChatBotWindow";
 
 const Chats = () => {
   const { chatStore } = useContext(Context);
@@ -56,6 +57,9 @@ const Chats = () => {
               <NoChatSelected />
             ) : isBlocked ? (
               <UserBlocked userId={selectedUser._id} />
+            ) : selectedUser?.isChatBot ? (
+              // Если это бот, показываем окно с ботом
+              <ChatBotWindow />
             ) : (
               <ChatContainer />
             )}
