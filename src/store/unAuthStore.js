@@ -1,5 +1,7 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import UnAuthService from "../services/UnAuthService";
+import { error, log } from "../utils/logger";
+import { showToast } from "../services/toastService";
 export default class Store {
   cars = {};
   isLoading = false;
@@ -12,14 +14,14 @@ export default class Store {
   setLoading(bool) {
     runInAction(() => {
       this.isLoading = bool;
-      console.log("Loading set to:", this.isLoading);
+      log("Loading set to:", this.isLoading);
     });
   }
   setCars(cars) {
     runInAction(() => {
       // Преобразуем в массив, если это объект
       this.cars = Array.isArray(cars) ? cars : Object.values(cars);
-      console.log("cars set to:", this.cars);
+      log("cars set to:", this.cars);
     });
   }
 
@@ -30,22 +32,19 @@ export default class Store {
         notificationTO: settings.notificationTO || false,
         notificationNewRequests: settings.notificationNewRequests || false,
       };
-      console.log("Settings set to:", this.settings);
+      log("Settings set to:", this.settings);
     });
   }
 
   async fetchCarsUnAuth() {
     try {
-      console.log("fetchCarsUnAuth");
+      log("fetchCarsUnAuth");
       const response = await UnAuthService.fetchCarsUnAuth();
-      console.log("response", response);
+      log("response", response);
       this.setCars(response.data);
     } catch (e) {
-      console.log(e.response?.data?.message);
+      error(e.response?.data?.message);
+      showToast({ text1: "Произошла ошибка", type: "error" });
     }
   }
-
-
 }
-
-

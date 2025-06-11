@@ -1,0 +1,36 @@
+.auth-container {
+    display: flex;
+    height: 100vh;
+    background: #f9f9f9;
+  }
+  
+  .auth-sidebar {
+    width: 400px;
+    background-color: #1f1f1f;
+    color: white;
+    padding: 6rem 1rem 1rem 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  .auth-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .auth-buttons button {
+    background: #3a3a3a;
+    border: none;
+    padding: 10px;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 6px;
+    transition: background 0.3s;
+  }
+  
+  .auth-buttons button:hover {
+    background: #5a5a5a;
+  }

@@ -3,6 +3,8 @@ import { ChatService } from "../services/ChatService";
 import $api, { API_URL } from "../http/axios";
 import { io } from "socket.io-client";
 import { store } from "..";
+import { showToast } from "../services/toastService";
+import { error, log } from "../utils/logger";
 
 export default class ChatStore {
   messages = [];
@@ -24,43 +26,44 @@ export default class ChatStore {
   setisMessagesLoading(bool) {
     runInAction(() => {
       this.isMessagesLoading = bool;
-      console.log("isMessagesLoading set to:", this.isMessagesLoading);
+      log("isMessagesLoading set to:", this.isMessagesLoading);
     });
   }
 
   setisUsersLoading(bool) {
     runInAction(() => {
       this.isUsersLoading = bool;
-      console.log("isUsersLoading set to:", this.isUsersLoading);
+      log("isUsersLoading set to:", this.isUsersLoading);
     });
   }
 
   setSelectedUser(user) {
     runInAction(() => {
       this.selectedUser = user;
-      console.log("Selected user set to:", this.selectedUser);
+      log("Selected user set to:", this.selectedUser);
     });
   }
 
   setMessages(messages) {
     runInAction(() => {
       this.messages = messages;
-      console.log("Messages set to:", this.messages);
+      log("Messages set to:", this.messages);
     });
   }
 
-  async getUsers(showToast) {
-    console.log("getUsers");
+  async getUsers() {
+    log("getUsers");
     this.isUsersLoading = true;
     try {
       const users = await ChatService.getUsers();
-      console.log(users);
+      log(users);
       this.users = users.users;
       this.hasBotChat = users.hasBotChat;
       this.botId = users.botId;
-      console.log('this.users', JSON.stringify(this.users));
-    } catch (error) {
-      console.log(error.response?.data?.message || "Ошибка загрузки пользователей");
+      log('this.users', JSON.stringify(this.users));
+    } catch (e) {
+      error(e.response?.data?.message || "Ошибка загрузки пользователей");
+      showToast({ text1: "Произошла ошибка", type: "error" });
     } finally {
       this.isUsersLoading = false;
     }
@@ -69,23 +72,27 @@ export default class ChatStore {
   async getMessages(userId) {
     try {
       const res = await $api.get(`/chats/${userId}`);
-      console.log("Полученные сообщения:", res.data);
+      log("Полученные сообщения:", res.data);
       if (this.setMessages) {
         this.setMessages(res.data);
       } else {
-        console.error("setMessages не найден в chatStore");
+        error("setMessages не найден в chatStore");
       }
-    } catch (error) {
-      console.error("Ошибка при получении сообщений:", error);
+    } catch (e) {
+      error("Ошибка при получении сообщений:", e);
+      showToast({
+        text1: e.response?.data || "Неизвестная ошибка",
+        type: "error",
+      })
     } 
   }
 
 
 
-  async reportToMessage (messageId, reason , showToast) {
+  async reportToMessage (messageId, reason) {
     try {
       if(!messageId || !reason) {
-        console.log("Ошибка: messageId или reason не определены");
+        log("Ошибка: messageId или reason не определены");
         return;
       }
       const res = await $api.post(`/chats/report` , {messageId , reason});
@@ -95,17 +102,17 @@ export default class ChatStore {
           type: "success",
         });
       }
-    } catch (error) {
-      console.error("Ошибка при получении сообщений:", error);
+    } catch (e) {
+      error("Ошибка при получении сообщений:", e);
       showToast({
-        text1: error.response?.data || "Неизвестная ошибка",
+        text1: e.response?.data || "Неизвестная ошибка",
         type: "error",
       })
     } 
   }
 
   async sendMessage(messageData, selectedUser) {
-    console.log("ChatStore context in sendMessage:", this);
+    log("ChatStore context in sendMessage:", this);
     if (!selectedUser) return;
     let newMessage = null;
     try {
@@ -113,9 +120,9 @@ export default class ChatStore {
         if (!newMessage || !newMessage._id) {
             throw new Error("Сервер вернул некорректный ответ: " + JSON.stringify(newMessage));
         }
-        console.log("Новое сообщение:", newMessage);
+        log("Новое сообщение:", newMessage);
         runInAction(() => {
-            console.log("newServerMessage", JSON.stringify(newMessage));
+            log("newServerMessage", JSON.stringify(newMessage));
             if (this.setMessages) {
                 this.setMessages([...this.messages, {
                     ...newMessage,
@@ -123,30 +130,31 @@ export default class ChatStore {
                     receiverId: newMessage.receiverId.toString(),
                 }]);
             } else {
-                console.error("Ошибка: setMessages не определена в ChatStore");
+                error("Ошибка: setMessages не определена в ChatStore");
             }
         });
-    } catch (error) {
-        console.error("Ошибка в sendMessage:", error);
+    } catch (e) {
+        error("Ошибка в sendMessage:", e);
+        showToast({ text1: "Произошла ошибка", type: "error" });
     }
 }
 
   subscribeToMessages() {
     if (!this.selectedUser) {
-      console.log("Ошибка: selectedUser не определён при подписке");
+      log("Ошибка: selectedUser не определён при подписке");
       return;
     }
   
     if (!this.socket) {
-      console.log("Ошибка: socket не инициализирован при подписке");
+      log("Ошибка: socket не инициализирован при подписке");
       return;
     }
   
     this.socket.on("newMessage", (newMessage) => {
-      console.log("newMessage", newMessage);
+      log("newMessage", newMessage);
       if (newMessage.senderId === this.selectedUser?._id) {
         if (newMessage.senderId === this.selectedUser?._id) {
-          console.log("newSOcketMessage", JSON.stringify(newMessage));
+          log("newSOcketMessage", JSON.stringify(newMessage));
           
           runInAction(() => {
             this.messages.push({
@@ -162,7 +170,7 @@ export default class ChatStore {
 
   unsubscribeFromMessages() {
     if (!this.socket) {
-      console.log("Ошибка: socket не инициализирован при отписке");
+      log("Ошибка: socket не инициализирован при отписке");
       return;
     }
     this.socket.off("newMessage");
@@ -176,14 +184,14 @@ export default class ChatStore {
       query: { userId: user.id },
     });
     this.socket.connect();
-    console.log("Socket connecnet");
+    log("Socket connecnet");
     this.socket.on("getOnlineUsers", (userIds) => {
       this.onlineUsers = userIds;
     });
   }
   
   disconnectSocket() {
-    console.log("Socket disconnected");
+    log("Socket disconnected");
     if (this.socket?.connected) this.socket.disconnect();
   }
 

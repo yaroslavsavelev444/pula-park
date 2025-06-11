@@ -1,4 +1,6 @@
 import $api, { API_URL } from "../http/axios";
+import { error, log } from "../utils/logger";
+import { showToast } from "./toastService";
 
 class CompanyService {
     static async fetchCompanyData() {
@@ -12,7 +14,7 @@ class CompanyService {
             const response = await $api.get(`${API_URL}/cars/allVehicleData`, { params: { ownerId, selectedStatus, selectedType, selectedSortOptions, page, limit } });
             return response.data;
         } catch (e) {
-            console.log(e.response?.data?.message);
+            error(e.response?.data?.message);
             throw e;
         }
     }
@@ -26,7 +28,7 @@ class CompanyService {
             });
             return response.data;
         } catch (e) {
-            console.log(e.response?.data?.message);
+            error(e.response?.data?.message);
             throw e;
         }
     }
@@ -39,7 +41,7 @@ class CompanyService {
             });
             return response.data;
         } catch (e) {
-            console.log(e.response?.data?.message);
+            error(e.response?.data?.message);
             throw e;
         }
     }
@@ -48,7 +50,7 @@ class CompanyService {
             const response = await $api.post(`${API_URL}/cars/archiveCar`, { carId });
             return response.data;
         } catch (e) {
-            console.log(e.response?.data?.message);
+            error(e.response?.data?.message);
             throw e;
         }
     }
@@ -57,7 +59,7 @@ class CompanyService {
             const response = await $api.post(`${API_URL}/cars/deleteCar`, { carId });
             return response.data;
         } catch (e) {
-            console.log(e.response?.data?.message);
+            error(e.response?.data?.message);
             throw e;
         }
     }
@@ -66,24 +68,16 @@ class CompanyService {
             const response = await $api.post(`${API_URL}/cars/returnCar`, { carId });
             return response.data;
         } catch (e) {
-            console.log(e.response?.data?.message);
+            error(e.response?.data?.message);
             throw e;
         }
     }
-    static async updateCarData (carId, depositAmount, pricePerDay, showToast) {
+    static async updateCarData (carId, depositAmount, pricePerDay) {
         try {
             const response = await $api.post(`${API_URL}/cars/updateCarData`, { carId, depositAmount, pricePerDay });
-            showToast({
-                text1: "Данные успешно изменены",
-                type: "success",
-            })
             return response.data;
         } catch (e) {
-            showToast({
-                text1: "Произошла ошибка",
-                type: "error",
-            })
-            console.log(e.response?.data?.message);
+            error(e.response?.data?.message);
             throw e;
         }
     }
@@ -94,7 +88,7 @@ class CompanyService {
             const response = await $api.get(`${API_URL}/request/getRequests`, { params: { ownerId, filterParam , sortParam , limit , page} });
             return response.data;
         } catch (e) {
-            console.log(e.response?.data?.message);
+            error(e.response?.data?.message);
             throw e;
         }
     }
@@ -103,7 +97,7 @@ class CompanyService {
             const response = await $api.patch(`${API_URL}/request/updateRequestStatus`, { requestId, newStatus, startDate, endDate });
             return response.data;   
         } catch (e) {
-            console.log(e.response?.data?.message);
+            error(e.response?.data?.message);
             throw e;
         }
     }
@@ -112,7 +106,7 @@ class CompanyService {
             const response = await $api.patch(`${API_URL}/request/cancelRequest`, { requestId, message });
             return response.data;
         } catch (e) {
-            console.log(e.response?.data?.message);
+            error(e.response?.data?.message);
             throw e;
         }
     }
@@ -124,7 +118,7 @@ class CompanyService {
             const response = await $api.get(`${API_URL}/rental/getRentals`, { params: { ownerId, filterParam , sortParam, limit, page } });
             return response.data;
         } catch (e) {
-            console.log(e.response?.data?.message);
+            error(e.response?.data?.message);
             throw e;
         }
     }
@@ -134,13 +128,9 @@ class CompanyService {
         const response = await $api.patch(`${API_URL}/rental/cancelRental`, { rentalId, cancelInputValue: cancelReason });
         return response.data;
         
-     } catch (error) {
-        showToast({
-            text1: "Произошла ошибка",
-            type: "error",
-        })
-        console.log(error.response?.data?.message);
-        throw error;
+     } catch (e) {
+        error(e.response?.data?.message);
+        throw e;
      }
     }
     static async fetchUserData(userId, fields) {
@@ -148,11 +138,11 @@ class CompanyService {
             const response = await $api.get(`${API_URL}/users/getUserInfo`, {
                 params: { userId, fields } 
             });
-            console.log("responsefetchUserData", response); 
+            log("responsefetchUserData", response); 
             return response.data;
-        } catch (error) {
-            console.log(error.response?.data?.message);
-            throw error;
+        } catch (e) {
+            error(e.response?.data?.message);
+            throw e;
         }
     }
 
@@ -161,11 +151,11 @@ class CompanyService {
             const response = await $api.patch(`${API_URL}/users/rateUser`, {
                 ratedId : userId
             });
-            console.log("response", response);
+            log("response", response);
             return response.data;
-        } catch (error) {
-            console.log(error.response?.data?.message);
-            throw error;
+        } catch (e) {
+            error(e.response?.data?.message);
+            throw e;
         }
     }
 
@@ -175,11 +165,11 @@ static async blockUser(id ) {
             blockedUserId : id 
         });
         
-        console.log("response", response);
+        log("response", response);
         return response.data;
-    } catch (error) {
-        console.log(error.response?.data?.message);
-        throw error;
+    } catch (e) {
+        error(e.response?.data?.message);
+        throw e;
     }
 }
 

@@ -1,4 +1,5 @@
 import $api from "../http/axios";
+import { error, log } from "../utils/logger";
 
 export const ChatService = {
   async getUsers() {
@@ -8,7 +9,7 @@ export const ChatService = {
 
   async getMessages(userId) {
     const res = await $api.get(`/chats/${userId}`);
-    console.log(res.data);
+    log(res.data);
     return res.data;
   },
 
@@ -16,9 +17,10 @@ export const ChatService = {
     try {
         const res = await $api.post(`/chats/send/${userId}`, messageData);
         return res.data;
-    } catch (error) {
-        console.error("Error sending message:", error);
-        throw error; // или обработайте ошибку как нужно
+    } catch (e) {
+        error
+        ("Error sending message:", e);
+        throw e; // или обработайте ошибку как нужно
     }
 }
 };

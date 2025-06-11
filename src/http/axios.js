@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-export const API_URL = `http://localhost:3000`;
+export const API_URL = 'http://localhost:3001'; // http://172.20.10.2:3000
+
 
 const $api = axios.create({
     withCredentials: true,
@@ -23,10 +24,17 @@ $api.interceptors.response.use((config) => {
             localStorage.setItem('token', response.data.accessToken);
             return $api.request(originalRequest);
         } catch (e) {
-            console.log('НЕ АВТОРИЗОВАН')
+            error('НЕ АВТОРИЗОВАН')
         }
     }
-    throw error;
+
+    const formattedError = {
+        status: error.response?.status || 500,
+        message: error.response?.data?.message || "Ошибка соединения с сервером",
+        errors: error.response?.data?.errors || [],
+      };
+  
+      return Promise.reject(formattedError); // ✅ вернёт красиво оформленную ошибку
 })
 
 export default $api;

@@ -1,0 +1,68 @@
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  text-align: center;
+  width: 90%;
+  max-width: 400px;
+}
+
+.code-inputs {
+  display: flex;
+  justify-content: space-between;
+  margin: 20px 0;
+}
+
+.code-inputs input {
+  width: 40px;
+  height: 50px;
+  font-size: 1.5rem;
+  text-align: center;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.close-link {
+  margin-top: 10px;
+  cursor: pointer;
+  color: #888;
+  font-size: 0.9rem;
+  text-decoration: underline;
+}
+.resend-section {
+  margin-top: 10px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.resend-button {
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 14px;
+}
+
+.resend-button:hover {
+  color: #0056b3;
+}
+
+.phone-info {
+  font-size: 14px;
+  margin-bottom: 10px;
+  text-align: center;
+}

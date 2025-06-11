@@ -13,6 +13,16 @@
 }
 
 /* Кнопка с фоном */
+
+[data-theme="dark"] .btn {
+  background-color: #000000;
+}
+
+[data-theme="light"] .btn {
+  background-color: #fff;
+  color: #333;
+}
+
 .btn-with-bg {
   background-color: #333;
 }
