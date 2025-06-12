@@ -28,7 +28,6 @@ const ChatContainer = () => {
   const [lastMessageDate, setLastMessageDate] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState(null);
-  const [menuSelectVisible, setMenuSelectVisible] = useState(false);
   const [reportReason, setReportReason] = useState(false);
 
   const monthNames = [
@@ -168,7 +167,6 @@ const ChatContainer = () => {
             log(value);
           }}
           onClose={() => {
-            setMenuSelectVisible(false);
             log("closed");
           }}
           onChange={(value) => {

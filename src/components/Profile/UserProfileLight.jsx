@@ -25,7 +25,7 @@ const UserProfileLight = ({ user , actions}) => {
   };
 
   if (!user?._id) {
-    return <div>Loading...</div>; // Можно добавить проверку, если user или userId отсутствуют
+    return <div>Loading...</div>;
   }
 
   return (

@@ -9,6 +9,7 @@ export default class Store {
   user = {};
   isAuth = false;
   isLoading = false;
+  isLoadingRequests = false;
   settings = {};
   pendingUserId = null;
   constructor() {
@@ -41,6 +42,13 @@ export default class Store {
       log("Loading set to:", this.isLoading);
     });
   }
+
+  setIsLoadingRequests(bool) {
+    runInAction(() => {
+      this.isLoadingRequests = bool;
+      log("LoadingRequests set to:", this.isLoadingRequests);
+    });
+  }
   setSettings(settings) {
     runInAction(() => {
       // Устанавливаем настройки с фиксированными полями
@@ -66,6 +74,7 @@ export default class Store {
   }
 
   async login(email, password) {
+    this.setIsLoadingRequests(true);
     try {
       const response = await AuthService.login(email, password);
 
@@ -79,9 +88,13 @@ export default class Store {
       showToast({ text1: e?.message, type: "error" });
       throw new Error(e);
     }
+    finally{
+      this.setIsLoadingRequests(false);
+    }
   }
 
   async registration(email, password, phone, name, surname, role, type) {
+    this.setIsLoadingRequests(true);
   try {
     const response = await AuthService.registration(email, password, phone, name, surname, role, type);
     const userId = response?.data?.userId;
@@ -95,6 +108,9 @@ export default class Store {
     error(e.response?.data?.message || e.message);
     showToast({ text1: e.response?.data?.message || "Ошибка регистрации", type: "error" });
     throw e;
+  }
+  finally{
+    this.setIsLoadingRequests(false);
   }
 }
 
@@ -183,7 +199,7 @@ export default class Store {
 
   async verifyEmailCode(code) {
   try {
-    this.setLoading(true);
+    this.setIsLoadingRequests(true);
     if(!this.pendingUserId){
       throw new Error("Пользователь не найден");
     }
@@ -197,20 +213,20 @@ export default class Store {
     return res;
   } catch (e) {
     showToast({
-      text1: e.message || "Неизвестная ошибка",
+      text1: e?.message || "Неизвестная ошибка",
       type: "error",
     })
     error("Error:", e?.message);
     throw e;
   }
   finally{
-    this.setLoading(false);
+    this.setIsLoadingRequests(false);
   }
 }
 
 async verifyPhoneCode(code) {
   try {
-    this.setLoading(true);
+    this.setIsLoadingRequests(true);
     if(!this.pendingUserId){
       throw new Error("Пользователь не найден");
     }
@@ -224,7 +240,7 @@ async verifyPhoneCode(code) {
     throw e;
   }
   finally{
-    this.setLoading(false);
+    this.setIsLoadingRequests(false);
   }
 }
 

@@ -52,7 +52,6 @@ export default class ChatStore {
   }
 
   async getUsers() {
-    log("getUsers");
     this.isUsersLoading = true;
     try {
       const users = await ChatService.getUsers();
@@ -60,7 +59,6 @@ export default class ChatStore {
       this.users = users.users;
       this.hasBotChat = users.hasBotChat;
       this.botId = users.botId;
-      log('this.users', JSON.stringify(this.users));
     } catch (e) {
       error(e.response?.data?.message || "Ошибка загрузки пользователей");
       showToast({ text1: "Произошла ошибка", type: "error" });

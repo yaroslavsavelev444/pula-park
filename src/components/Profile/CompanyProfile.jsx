@@ -6,7 +6,7 @@ import { IoMdSettings } from "react-icons/io";
 import Empty from "../Empty/Empty";
 import { log } from "../../utils/logger";
 
-const CompanyProfile = ({ companyStore, handleCheckIsEmailVerified, handleOpenSettingsModal }) => {
+const CompanyProfile = ({ companyStore }) => {
   log("companyStore.hasCompany", companyStore.hasCompany);
   return (
     <div className="company-profile">
@@ -23,7 +23,6 @@ const CompanyProfile = ({ companyStore, handleCheckIsEmailVerified, handleOpenSe
                 <p>
                   <h1>{companyStore?.company?.companyName}</h1>
                 </p>
-                <IoMdSettings className="settings-icon"  onClick={handleOpenSettingsModal}/>
               </div>
             ) : (
               <div className="default-avatar">No Avatar</div>
@@ -46,7 +45,7 @@ const CompanyProfile = ({ companyStore, handleCheckIsEmailVerified, handleOpenSe
         <div className="company-profile">
           <Empty text="Нет профиля компании" />
           <div className="btn-wrapper-company">
-            <Button onClick={handleCheckIsEmailVerified}>Добавить</Button>
+            <Button>Добавить</Button>
           </div>
         </div>
       )}

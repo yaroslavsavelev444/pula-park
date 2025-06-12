@@ -57,13 +57,13 @@ const NavBar = () => {
 
           {isAuth && role === "Support" ? (
             <>
-              <NavLink
-                to="/support-chats"
+             <NavLink
+                to="/chats"
                 className={({ isActive }) =>
                   isActive ? "nav-active" : "nav-link"
                 }
               >
-                Чаты поддержки
+                Чаты
               </NavLink>
               <NavLink
                 to="/complaints"

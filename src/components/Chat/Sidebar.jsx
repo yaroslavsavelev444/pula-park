@@ -65,7 +65,6 @@ const Sidebar = () => {
         </div>
       </div>
 
-      {/* Используем универсальный компонент поиска */}
       <SearchInput
         value={searchQuery}
         onChange={handleSearchChange}

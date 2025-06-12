@@ -8,6 +8,8 @@ import "../form/Form.css";
 import { showToast } from "../services/toastService";
 import CodeVerificationModal from "../Modals/CodeVerificationModal/CodeVerificationModal";
 import { error, log } from "../utils/logger";
+import { observer } from "mobx-react-lite";
+import Loader from "../components/UI/Loader/Loader";
 
 const LoginForm = () => {
   const { store } = useContext(Context);
@@ -46,10 +48,11 @@ const LoginForm = () => {
       if (res.status === 200) {
         showToast({ text1: "Успешно подтверждено!", type: "success" });
         setShowCodeModal(false);
-        navigate("/dashboard"); // или куда надо
+        navigate("/profile");
       }
     } catch (e) {
       error("Error verifying code:", e);
+      
       showToast({ text1: e, type: "error" });
     } finally {
       setIsCodeSubmitting(false);
@@ -91,7 +94,7 @@ const LoginForm = () => {
             style={{ width: "90%" }}
           />
           <Button type="submit" disabled={!email.trim() || !password.trim()}>
-            Войти
+            {store.isLoadingRequests ? <Loader size={30} /> : "Вход"}
           </Button>
         </form>
       </div>
@@ -107,4 +110,4 @@ const LoginForm = () => {
   );
 };
 
-export default LoginForm;
+export default observer(LoginForm);

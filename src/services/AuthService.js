@@ -49,10 +49,6 @@ export default class AuthService {
     return $api.post("auth/logout");
   }
 
-  static async resendActivation(email) {
-    return $api.post("auth/resendActivationLink", { email });
-  }
-
   static async changePassword(oldPassword, newPassword, userId) {
     return $api.post("auth/changePassword", {
       oldPassword,

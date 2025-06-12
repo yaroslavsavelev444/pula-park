@@ -12,7 +12,6 @@ import CarImagesUpload from "../components/UI/CarImagesUpload/CarImagesUpload";
 import CarModalContent from "../components/Modals/CarModalContent";
 import { Checkbox } from "../components/UI/CheckBox/CheckBox";
 import Loader from "../components/UI/Loader/Loader";
-import { uploadImages } from "../utils/ImageOperations/uploadImages";
 import FilterBar from "../components/UI/FilterBar/FilterBar";
 import SelectMenu from "../components/UI/SelectMenu/SelectMenu";
 import Empty from "../components/Empty/Empty";
@@ -63,7 +62,7 @@ const Cars = () => {
 
   useEffect(() => {
     if (carId) {
-      const car = companyStore.cars.find((car) => car._id === carId);
+      const car = companyStore?.cars.find((car) => car?._id === carId);
       if (car) {
         log("car", car);
         setCarModalData(car);
@@ -73,12 +72,12 @@ const Cars = () => {
         navigate("/cars"); // Если id не найден, просто показываем список
       }
     }
-  }, [carId, companyStore.cars]);
+  }, [carId, companyStore?.cars]);
 
   const handleStatusOptionChange = (value) => {
     setSelectedStatuses(value);
     localStorage.setItem("carsStorageKeyStatuses", JSON.stringify(value));
-    if (companyStore.company._id !== null) {
+    if (companyStore?.company?._id !== null) {
       companyStore.fetchCarsData(
         companyStore.company._id,
         value,
@@ -91,9 +90,9 @@ const Cars = () => {
   const handleTypeOptionChange = (value) => {
     setSelectedTypes(value);
     localStorage.setItem("carsStorageKeyTypes", JSON.stringify(value));
-    if (companyStore.company._id !== null) {
+    if (companyStore?.company?._id !== null) {
       companyStore.fetchCarsData(
-        companyStore.company._id,
+        companyStore.company?._id,
         selectedStatuses,
         value,
         sortParam
@@ -104,9 +103,9 @@ const Cars = () => {
   const handleSortOptionChange = (value) => {
     setSortParam(value);
     localStorage.setItem("carSortData", JSON.stringify(value)); // Просто сохраняем строку
-    if (companyStore.company._id !== null) {
+    if (companyStore?.company?._id !== null) {
       companyStore.fetchCarsData(
-        companyStore.company._id,
+        companyStore?.company?._id,
         selectedStatuses,
         selectedTypes,
         value
@@ -119,19 +118,6 @@ const Cars = () => {
     setIsModalOpen(true);
   };
 
-  const handleCheckIsEmailVerified = () => {
-    if (!store.user.isActivated) {
-      log("Подтвердите почту, чтобы создать компанию");
-      showToast({
-        text1: "Подтвердите почту, чтобы создать компанию",
-        type: "error",
-      });
-      return;
-    }
-    log("Почта подтврждена, пропускаем к созданию компании");
-    handleAddCar();
-  };
-
   const handleCarModal = (car) => {
     setCarModalData(car);
     setModalContent("carModal");
@@ -140,7 +126,7 @@ const Cars = () => {
 
   const handleSendCarData = async () => {
     try {
-      const { urls, folderName } = await uploadImages(carImages, companyStore);
+      // const { urls, folderName } = await uploadImages(carImages, companyStore);
       if (!urls || urls.length < 3) {
         showToast({ text1: "Ошибка загрузки изображений", type: "error" });
         return;
@@ -200,10 +186,10 @@ const Cars = () => {
 
   //Динамическая пагинация
   useEffect(() => {
-      if (companyStore.company._id) {
+      if (companyStore?.company?._id) {
         setCurrentPage(1); // Сбрасываем номер страницы
         companyStore.fetchCarsData(
-          companyStore.company._id,
+          companyStore?.company?._id,
           selectedStatuses,
           selectedTypes,
           sortParam,
@@ -211,7 +197,7 @@ const Cars = () => {
           1
         )
       }
-    }, [companyStore.company._id, selectedStatuses, selectedTypes, sortParam, limit]);
+    }, [companyStore?.company?._id, selectedStatuses, selectedTypes, sortParam, limit]);
 
       useEffect(() => {
         if (isFetching) {
@@ -230,7 +216,7 @@ const Cars = () => {
             })
             .catch(() => setIsFetching(false)); 
         }
-      }, [isFetching, companyStore.company._id, selectedStatuses, selectedTypes, sortParam , limit]);
+      }, [isFetching, companyStore?.company?._id, selectedStatuses, selectedTypes, sortParam , limit]);
     
       useEffect(() => {
         document.addEventListener("scroll", scrollHandler);
@@ -248,14 +234,14 @@ const Cars = () => {
         ) {
           setIsFetching(true);
         }
-      }, [isFetching, companyStore.totalCars, companyStore.cars.length]);
+      }, [isFetching, companyStore?.totalCars, companyStore?.cars?.length]);
     
 
   return (
     <div className="page_wrapper">
       <div className="left-sidebar">
         <div className="left-add-car">
-          <Button onClick={handleCheckIsEmailVerified}>Добавить машину</Button>
+          <Button onClick={handleAddCar}>Добавить машину</Button>
         </div>
         <div className="left-sort">
           <>
